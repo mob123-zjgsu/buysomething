@@ -1,0 +1,68 @@
+<view class="cart-container">
+  <!-- 空状态 -->
+  <view class="empty-cart" wx:if="{{cartItems.length === 0}}">
+    <image class="empty-icon" src="/images/empty-cart.png" mode="aspectFit"></image>
+    <text class="empty-text">购物车还是空的</text>
+    <button class="btn-go-shopping" bindtap="goToShopping">去逛逛</button>
+  </view>
+
+  <!-- 购物车列表 -->
+  <view class="cart-content" wx:else>
+    <!-- 顶部导航 -->
+    <view class="cart-navbar">
+      <view class="nav-title">购物车</view>
+      <view class="nav-action" bindtap="toggleEditMode">
+        <text>{{isEditMode ? '完成' : '编辑'}}</text>
+      </view>
+    </view>
+
+    <!-- 购物车商品列表 -->
+    <view class="cart-list">
+      <view class="shop-section" wx:for="{{groupedCart}}" wx:key="shopId">
+        <view class="shop-header">
+          <checkbox class="shop-checkbox" checked="{{item.allSelected}}" bindtap="toggleShopSelect" data-shop-id="{{item.shopId}}" />
+          <text class="shop-name">{{item.shopName}}</text>
+        </view>
+
+        <view class="cart-item" wx:for="{{item.products}}" wx:for-item="product" wx:key="uniqueId">
+          <checkbox class="item-checkbox" checked="{{product.selected}}" bindtap="toggleItemSelect" data-shop-id="{{item.shopId}}" data-product-id="{{product.uniqueId}}" />
+          <image class="product-image" src="{{product.image}}" mode="aspectFill" bindtap="goToProductDetail" data-id="{{product.productId}}"></image>
+          <view class="product-info">
+            <view class="product-name" bindtap="goToProductDetail" data-id="{{product.productId}}">{{product.name}}</view>
+            <view class="product-spec">{{product.color}} / {{product.size}}</view>
+            <view class="product-bottom">
+              <text class="product-price">¥{{product.price}}</text>
+              <view class="quantity-control">
+                <button class="quantity-btn" bindtap="decreaseQuantity" data-shop-id="{{item.shopId}}" data-product-id="{{product.uniqueId}}">-</button>
+                <text class="quantity-num">{{product.quantity}}</text>
+                <button class="quantity-btn" bindtap="increaseQuantity" data-shop-id="{{item.shopId}}" data-product-id="{{product.uniqueId}}">+</button>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部结算栏 -->
+    <view class="checkout-bar">
+      <view class="select-all">
+        <checkbox class="select-all-checkbox" checked="{{allSelected}}" bindtap="toggleSelectAll" />
+        <text class="select-all-text">全选</text>
+      </view>
+      <view class="checkout-info">
+        <view class="total-price" wx:if="{{!isEditMode}}">
+          <text class="price-label">合计:</text>
+          <text class="price-value">¥{{totalPrice}}</text>
+          <text class="price-note">(含运费)</text>
+        </view>
+        <view class="selected-count" wx:else>
+          <text>已选 {{selectedCount}} 件</text>
+        </view>
+        <button class="btn-checkout" bindtap="handleCheckout" disabled="{{selectedCount === 0}}">
+          <text wx:if="{{isEditMode}}">删除</text>
+          <text wx:else>结算({{selectedCount}})</text>
+        </button>
+      </view>
+    </view>
+  </view>
+</view>
