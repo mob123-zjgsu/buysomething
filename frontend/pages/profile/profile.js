@@ -70,6 +70,13 @@ Page({
     })
   },
 
+  // 跳转到测试页面
+  goToTest() {
+    wx.navigateTo({
+      url: '/pages/test/test'
+    })
+  },
+
   editProfile() {
     wx.showToast({ title: '编辑资料', icon: 'none' })
   },

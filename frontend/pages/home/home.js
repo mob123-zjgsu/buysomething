@@ -28,7 +28,66 @@ Page({
 
   onLoad(options) {
     this.loadMoreProducts()
+    
+    // ==================== [测试代码开始] ====================
+    // 下面的代码用于测试云函数调用
+    // 测试完成后可以删除或注释掉
+    this.testCloudFunctions()
+    // ==================== [测试代码结束] ====================
   },
+
+  // ==================== [测试代码: 云函数测试] ====================
+  async testCloudFunctions() {
+    console.log('===== 开始云函数测试 =====')
+    
+    try {
+      // 测试1: 用户登录
+      const loginRes = await wx.cloud.callFunction({
+        name: 'login',
+        data: {
+          phone: '13800138001',
+          password: '123456',
+          code: '0000'
+        }
+      })
+      console.log('【测试】登录结果:', loginRes.result)
+      
+      // 测试2: 获取商品列表
+      const productsRes = await wx.cloud.callFunction({
+        name: 'products',
+        data: { page: 1, pageSize: 10 }
+      })
+      console.log('【测试】商品列表:', productsRes.result)
+      
+      // 测试3: 获取商品详情（如果有商品）
+      if (productsRes.result?.data?.list?.length > 0) {
+        const productId = productsRes.result.data.list[0].productId
+        const detailRes = await wx.cloud.callFunction({
+          name: 'product-detail',
+          data: { productId }
+        })
+        console.log('【测试】商品详情:', detailRes.result)
+        
+        // 测试4: 添加购物车
+        const cartRes = await wx.cloud.callFunction({
+          name: 'cart',
+          data: {
+            action: 'add',
+            userId: 'test-user-001',
+            productId,
+            quantity: 1
+          }
+        })
+        console.log('【测试】添加购物车:', cartRes.result)
+      }
+      
+      console.log('===== 云函数测试完成 =====')
+      
+    } catch (err) {
+      console.error('【测试】云函数调用失败:', err)
+    }
+  },
+  // ==================== [测试代码结束] ====================
 
   onPullDownRefresh() {
     wx.showLoading({ title: '刷新中...' })
