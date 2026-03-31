@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="header">
+    <text class="title">API 测试页面</text>
+    <button class="refresh-btn" bindtap="refreshTest">刷新测试</button>
+  </view>
+
+  <scroll-view scroll-y class="log-container">
+    <view wx:for="{{logs}}" wx:key="index" class="log-item">
+      <text>{{item}}</text>
+    </view>
+  </scroll-view>
+
+  <view class="result-section">
+    <text class="section-title">测试结果 ({{testResults.length}})</text>
+    <view wx:for="{{testResults}}" wx:key="name" class="result-item">
+      <view class="result-header">
+        <text class="result-name">{{item.name}}</text>
+        <text class="result-status">{{item.result.code === 0 ? '成功' : '失败'}}</text>
+      </view>
+      <text class="result-data">{{item.result.message}}</text>
+    </view>
+  </view>
+</view>
