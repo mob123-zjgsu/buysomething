@@ -100,14 +100,28 @@ Page({
     let countdown = 60
     this.setData({ countdown })
 
-    const timer = setInterval(() => {
+    // 清除之前的定时器
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer)
+    }
+
+    this.countdownTimer = setInterval(() => {
       countdown--
       this.setData({ countdown })
 
       if (countdown <= 0) {
-        clearInterval(timer)
+        clearInterval(this.countdownTimer)
+        this.countdownTimer = null
       }
     }, 1000)
+  },
+
+  // 页面卸载时清除定时器
+  onUnload() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer)
+      this.countdownTimer = null
+    }
   },
 
   passwordLogin() {
@@ -204,9 +218,8 @@ Page({
   },
 
   goToRegister() {
-    wx.showToast({
-      title: '注册功能',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/register/register'
     })
   },
 

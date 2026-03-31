@@ -1,0 +1,129 @@
+<view class="register-container">
+  <!-- 返回按钮 -->
+  <view class="back-btn" bindtap="goBack">
+    <text>‹</text>
+  </view>
+
+  <!-- Logo区域 -->
+  <view class="logo-section">
+    <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+    <text class="welcome-title">创建账号</text>
+    <text class="welcome-subtitle">加入优选购物,开启品质生活</text>
+  </view>
+
+  <!-- 注册表单 -->
+  <view class="register-form">
+    <!-- 测试环境提示 -->
+    <view class="test-tip">
+      <text>测试环境: 验证码固定为 123456</text>
+    </view>
+
+    <view class="input-group">
+      <view class="input-wrapper">
+        <text class="input-icon">📱</text>
+        <input
+          class="input-field"
+          type="number"
+          placeholder="请输入手机号"
+          maxlength="11"
+          bindinput="onPhoneInput"
+          value="{{phone}}"
+        />
+      </view>
+    </view>
+
+    <view class="input-group">
+      <view class="input-wrapper">
+        <text class="input-icon">🔢</text>
+        <input
+          class="input-field code-input"
+          type="number"
+          placeholder="请输入验证码(123456)"
+          maxlength="6"
+          bindinput="onCodeInput"
+          value="{{code}}"
+        />
+        <button
+          class="btn-code {{countdown > 0 ? 'countdown' : ''}}"
+          bindtap="sendCode"
+          disabled="{{countdown > 0}}"
+        >
+          <text wx:if="{{countdown > 0}}">{{countdown}}s后重试</text>
+          <text wx:else>获取验证码</text>
+        </button>
+      </view>
+    </view>
+
+    <view class="input-group">
+      <view class="input-wrapper">
+        <text class="input-icon">🔒</text>
+        <input 
+          class="input-field" 
+          type="{{showPassword ? 'text' : 'password'}}" 
+          placeholder="设置登录密码(6-20位)" 
+          maxlength="20"
+          bindinput="onPasswordInput" 
+          value="{{password}}"
+        />
+        <text class="eye-icon" bindtap="togglePassword">
+          {{showPassword ? '👁️' : '👁️‍🗨️'}}
+        </text>
+      </view>
+    </view>
+
+    <view class="input-group">
+      <view class="input-wrapper">
+        <text class="input-icon">🔒</text>
+        <input 
+          class="input-field" 
+          type="{{showConfirmPassword ? 'text' : 'password'}}" 
+          placeholder="确认登录密码" 
+          maxlength="20"
+          bindinput="onConfirmPasswordInput" 
+          value="{{confirmPassword}}"
+        />
+        <text class="eye-icon" bindtap="toggleConfirmPassword">
+          {{showConfirmPassword ? '👁️' : '👁️‍🗨️'}}
+        </text>
+      </view>
+    </view>
+
+    <!-- 密码强度提示 -->
+    <view class="password-strength" wx:if="{{password}}">
+      <view class="strength-label">密码强度:</view>
+      <view class="strength-bars">
+        <view class="strength-bar {{strength >= 1 ? 'active' : ''}} {{strength === 1 ? 'weak' : ''}}"></view>
+        <view class="strength-bar {{strength >= 2 ? 'active' : ''}} {{strength === 2 ? 'medium' : ''}}"></view>
+        <view class="strength-bar {{strength >= 3 ? 'active' : ''}} {{strength === 3 ? 'strong' : ''}}"></view>
+      </view>
+      <text class="strength-text {{strengthClass}}">{{strengthText}}</text>
+    </view>
+
+    <button 
+      class="btn-register {{!canRegister ? 'disabled' : ''}}" 
+      disabled="{{!canRegister}}" 
+      bindtap="register"
+    >
+      立即注册
+    </button>
+  </view>
+
+  <!-- 已有账号 -->
+  <view class="login-section">
+    <text class="login-text">已有账号?</text>
+    <text class="login-link" bindtap="goToLogin">立即登录</text>
+  </view>
+
+  <!-- 用户协议 -->
+  <view class="agreement">
+    <checkbox 
+      class="agreement-checkbox" 
+      checked="{{agreed}}" 
+      bindtap="toggleAgreement"
+    />
+    <text class="agreement-text">我已阅读并同意</text>
+    <text class="agreement-link" bindtap="viewAgreement">《用户协议》</text>
+    <text class="agreement-text">和</text>
+    <text class="agreement-link" bindtap="viewPrivacy">《隐私政策》</text>
+  </view>
+</view>
