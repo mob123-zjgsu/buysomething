@@ -38,24 +38,52 @@ exports.main = async (event, context) => {
     }
 
     const queryResult = await db.collection('products').doc(productId).get();
+    
+    // 兼容不同版本的返回格式
+    const productData = queryResult.data || queryResult || [];
+    const product = Array.isArray(productData) ? productData[0] : productData;
 
-    if (queryResult.data.length === 0) {
+    if (!product) {
       const result = { code: 1004, message: '商品不存在', data: {} };
       if (isHttpCall) return { statusCode: 404, headers, body: JSON.stringify(result) };
       return result;
     }
 
-    const product = queryResult.data[0];
+    // 如果没有 specs 字段，提供默认规格
+    const specs = (product && product.specs) || {};
+    const hasColors = specs.colors && specs.colors.length > 0;
+    const hasSizes = specs.sizes && specs.sizes.length > 0;
+    
+    // 为没有规格的商品设置默认规格
+    if (!hasColors && !hasSizes) {
+      specs.colors = ['标准'];
+      specs.sizes = ['标准'];
+    }
+    
+    // 统一处理图片 - 过滤无效的外部链接，使用本地图片
+    let image = product.image || '/images/product1.jpg';
+    if (image.includes('img.example.com') || image.includes('placeholder') || !image.startsWith('/images/')) {
+      image = '/images/product1.jpg';
+    }
+    let images = product.images && product.images.length > 0 ? product.images : [image];
+    // 过滤 images 数组中的无效链接
+    images = images.map(img => {
+      if (img.includes('img.example.com') || img.includes('placeholder') || !img.startsWith('/images/')) {
+        return image;
+      }
+      return img;
+    });
+    
     const productDetail = {
       productId: product._id,
       name: product.name,
       price: product.price,
       originalPrice: product.originalPrice,
-      image: product.image,
-      images: product.images || [],
+      image: image,
+      images: images,
       categoryId: product.categoryId,
       description: product.description || '',
-      specs: product.specs || {},
+      specs: specs,
       sales: product.sales || 0,
       rating: product.rating || 5,
       stock: product.stock || 0,

@@ -84,19 +84,45 @@ exports.main = async (event, context) => {
     const total = countResult.total;
 
     // 处理商品数据
-    const products = result.data.map(item => ({
-      productId: item._id,
-      name: item.name,
-      price: item.price,
-      originalPrice: item.originalPrice,
-      image: item.image,
-      images: item.images || [],
-      categoryId: item.categoryId,
-      sales: item.sales || 0,
-      rating: item.rating || 5,
-      stock: item.stock || 999,
-      specs: item.specs || {}
-    }));
+    const products = result.data.map(item => {
+      // 如果没有 specs 字段，提供默认规格
+      let specs = item.specs || {};
+      const hasColors = specs.colors && specs.colors.length > 0;
+      const hasSizes = specs.sizes && specs.sizes.length > 0;
+      
+      if (!hasColors && !hasSizes) {
+        specs.colors = ['标准'];
+        specs.sizes = ['标准'];
+      }
+      
+      // 统一处理图片 - 过滤无效的外部链接，使用本地图片
+      let image = item.image || '/images/product1.jpg';
+      if (image.includes('img.example.com') || image.includes('placeholder') || !image.startsWith('/images/')) {
+        image = '/images/product1.jpg';
+      }
+      let images = item.images && item.images.length > 0 ? item.images : [image];
+      // 过滤 images 数组中的无效链接
+      images = images.map(img => {
+        if (img.includes('img.example.com') || img.includes('placeholder') || !img.startsWith('/images/')) {
+          return image;
+        }
+        return img;
+      });
+      
+      return {
+        productId: item._id,
+        name: item.name,
+        price: item.price,
+        originalPrice: item.originalPrice,
+        image: image,
+        images: images,
+        categoryId: item.categoryId,
+        sales: item.sales || 0,
+        rating: item.rating || 5,
+        stock: item.stock || 999,
+        specs: specs
+      };
+    });
 
     const responseData = {
       code: 0,
