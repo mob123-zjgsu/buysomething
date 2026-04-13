@@ -71,7 +71,7 @@ exports.main = async (event, context) => {
         _id: openidCheck.data[0]._id,
         _openid: OPENID,
         nickname: openidCheck.data[0].nickname || '用户' + phone.substring(7),
-        avatar: openidCheck.data[0].avatar || '',
+        avatar: openidCheck.data[0].avatar || '/images/default-avatar.png',
         phone: phone,
         points: openidCheck.data[0].points || 0,
         level: openidCheck.data[0].level || 1
@@ -92,7 +92,7 @@ exports.main = async (event, context) => {
         phone: phone,
         password: password,
         nickname: '用户' + phone.substring(7),
-        avatar: '',
+        avatar: '/images/default-avatar.png',
         gender: 0,
         city: '',
         province: '',
@@ -107,7 +107,7 @@ exports.main = async (event, context) => {
       _id: result._id,
       _openid: OPENID,
       nickname: '用户' + phone.substring(7),
-      avatar: '',
+      avatar: '/images/default-avatar.png',
       phone: phone,
       points: 0,
       level: 1
