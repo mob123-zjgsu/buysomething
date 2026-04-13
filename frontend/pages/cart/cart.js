@@ -18,12 +18,15 @@ Page({
 
   loadCart() {
     const cart = wx.getStorageSync('cart') || []
+    console.log('购物车页面加载，读取到的数据:', cart)
     this.setData({ cartItems: cart })
     this.groupCartByShop()
     this.calculateTotal()
   },
 
   groupCartByShop() {
+    console.log('groupCartByShop 开始执行，cartItems:', this.data.cartItems)
+    
     // 模拟按店铺分组
     const grouped = [
       {
@@ -37,6 +40,8 @@ Page({
         }))
       }
     ]
+    
+    console.log('分组后的商品:', grouped[0]?.products)
 
     // 检查每个店铺是否全选
     grouped.forEach(shop => {
@@ -202,6 +207,11 @@ Page({
 
   goToProductDetail(e) {
     const id = e.currentTarget.dataset.id
+    console.log('点击商品，ID:', id)
+    if (!id) {
+      wx.showToast({ title: '商品信息不完整', icon: 'none' })
+      return
+    }
     wx.navigateTo({
       url: `/pages/product-detail/product-detail?id=${id}`
     })

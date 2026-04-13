@@ -15,92 +15,93 @@ Page({
       { id: 5, name: '领券中心', icon: '🎫', type: 'coupon', bgColor: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)' },
       { id: 6, name: '签到有礼', icon: '🎁', type: 'checkin', bgColor: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)' }
     ],
-    products: [
-      { id: 1, name: '夏季新款纯棉T恤', price: 99, originalPrice: 199, sales: 1000, image: '/images/product1.jpg' },
-      { id: 2, name: '时尚休闲运动鞋', price: 299, originalPrice: 499, sales: 800, image: '/images/product2.jpg' },
-      { id: 3, name: '轻薄透气防晒外套', price: 159, originalPrice: 299, sales: 600, image: '/images/product3.jpg' },
-      { id: 4, name: '简约百搭牛仔裤', price: 129, originalPrice: 259, sales: 1200, image: '/images/product4.jpg' },
-      { id: 5, name: '舒适棉质居家服', price: 89, originalPrice: 159, sales: 500, image: '/images/product5.jpg' },
-      { id: 6, name: '潮流运动背包', price: 199, originalPrice: 399, sales: 700, image: '/images/product6.jpg' }
-    ],
-    hasMore: true
+    products: [],
+    hasMore: true,
+    page: 1,
+    loading: false
   },
 
   onLoad(options) {
-    this.loadMoreProducts()
-    
-    // ==================== [测试代码开始] ====================
-    // 下面的代码用于测试云函数调用
-    // 测试完成后可以删除或注释掉
-    this.testCloudFunctions()
-    // ==================== [测试代码结束] ====================
+    console.log('首页加载，商品数量:', this.data.products.length)
+    this.loadProducts()
   },
 
-  // ==================== [测试代码: 云函数测试] ====================
-  async testCloudFunctions() {
-    console.log('===== 开始云函数测试 =====')
-    
-    try {
-      // 测试1: 用户登录
-      const loginRes = await wx.cloud.callFunction({
-        name: 'login',
-        data: {
-          phone: '13800138001',
-          password: '123456',
-          code: '0000'
-        }
-      })
-      console.log('【测试】登录结果:', loginRes.result)
-      
-      // 测试2: 获取商品列表
-      const productsRes = await wx.cloud.callFunction({
-        name: 'products',
-        data: { page: 1, pageSize: 10 }
-      })
-      console.log('【测试】商品列表:', productsRes.result)
-      
-      // 测试3: 获取商品详情（如果有商品）
-      if (productsRes.result?.data?.list?.length > 0) {
-        const productId = productsRes.result.data.list[0].productId
-        const detailRes = await wx.cloud.callFunction({
-          name: 'product-detail',
-          data: { productId }
-        })
-        console.log('【测试】商品详情:', detailRes.result)
-        
-        // 测试4: 添加购物车
-        const cartRes = await wx.cloud.callFunction({
-          name: 'cart',
-          data: {
-            action: 'add',
-            userId: 'test-user-001',
-            productId,
-            quantity: 1
-          }
-        })
-        console.log('【测试】添加购物车:', cartRes.result)
-      }
-      
-      console.log('===== 云函数测试完成 =====')
-      
-    } catch (err) {
-      console.error('【测试】云函数调用失败:', err)
+  onShow() {
+    // 每次显示页面时刷新数据（仅第一页）
+    if (this.data.page === 1) {
+      this.loadProducts()
     }
   },
-  // ==================== [测试代码结束] ====================
+
+  // 加载商品列表
+  async loadProducts() {
+    if (this.data.loading) {
+      console.log('正在加载中，跳过')
+      return
+    }
+    
+    this.setData({ loading: true })
+    
+    try {
+      console.log('开始加载商品，页码:', this.data.page)
+      
+      const res = await wx.cloud.callFunction({
+        name: 'products',
+        data: {
+          page: this.data.page,
+          pageSize: 10
+        }
+      })
+      
+      console.log('商品加载结果:', res.result)
+      
+      if (res.result && res.result.code === 0) {
+        const newProducts = res.result.data.list || []
+        console.log('获取到商品数量:', newProducts.length)
+        
+        // 如果是第一页，直接设置；否则追加
+        if (this.data.page === 1) {
+          this.setData({ products: newProducts })
+        } else {
+          this.setData({ products: [...this.data.products, ...newProducts] })
+        }
+        
+        // 判断是否还有更多
+        const total = res.result.data.total || 0
+        this.setData({ 
+          hasMore: this.data.products.length < total 
+        })
+        
+        console.log('当前商品总数:', this.data.products.length, '总商品数:', total)
+      } else {
+        console.error('获取商品列表失败:', res.result)
+        wx.showToast({
+          title: '加载失败，请下拉刷新',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      console.error('获取商品列表失败:', err)
+      wx.showToast({
+        title: '网络错误',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
 
   onPullDownRefresh() {
-    wx.showLoading({ title: '刷新中...' })
-    setTimeout(() => {
-      wx.hideLoading()
+    this.setData({ page: 1, hasMore: true })
+    this.loadProducts().then(() => {
       wx.stopPullDownRefresh()
-      wx.showToast({ title: '刷新成功', icon: 'success' })
-    }, 1000)
+    })
   },
 
   onReachBottom() {
-    if (this.data.hasMore) {
-      this.loadMoreProducts()
+    if (this.data.hasMore && !this.data.loading) {
+      this.setData({ page: this.data.page + 1 })
+      this.loadProducts()
     }
   },
 
@@ -159,19 +160,6 @@ Page({
     const id = e.currentTarget.dataset.id
     wx.navigateTo({
       url: `/pages/product-detail/product-detail?id=${id}`
-    })
-  },
-
-  loadMoreProducts() {
-    // 模拟加载更多
-    const newProducts = [
-      { id: 7, name: '时尚百搭连衣裙', price: 179, originalPrice: 329, sales: 400, image: '/images/product7.jpg' },
-      { id: 8, name: '休闲百搭卫衣', price: 149, originalPrice: 279, sales: 900, image: '/images/product8.jpg' }
-    ]
-
-    this.setData({
-      products: [...this.data.products, ...newProducts],
-      hasMore: false
     })
   }
 })

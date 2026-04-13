@@ -98,11 +98,11 @@ Page({
   },
 
   checkCanRegister() {
-    const { phone, code, password, confirmPassword, agreed, countdown } = this.data
+    const { phone, code, password, confirmPassword, agreed } = this.data
     const phoneReg = /^1[3-9]\d{9}$/
 
     const isPhoneValid = phoneReg.test(phone)
-    const isCodeValid = code.length === 6 && countdown === 0
+    const isCodeValid = code.length === 6
     const isPasswordValid = password.length >= 6 && password.length <= 20
     const isPasswordMatch = password === confirmPassword && password !== ''
     const isAgreed = agreed

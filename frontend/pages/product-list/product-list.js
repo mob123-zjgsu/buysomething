@@ -3,28 +3,101 @@ Page({
     categoryName: '',
     activeFilter: 'all',
     priceSort: 'desc',
-    products: [
-      { id: 1, name: '夏季新款纯棉T恤', price: 99, originalPrice: 199, sales: 1000, rating: 4.8, tags: ['新品', '热销'], image: '/images/product1.jpg' },
-      { id: 2, name: '时尚休闲运动鞋', price: 299, originalPrice: 499, sales: 800, rating: 4.9, tags: ['包邮'], image: '/images/product2.jpg' },
-      { id: 3, name: '轻薄透气防晒外套', price: 159, originalPrice: 299, sales: 600, rating: 4.7, tags: [], image: '/images/product3.jpg' },
-      { id: 4, name: '简约百搭牛仔裤', price: 129, originalPrice: 259, sales: 1200, rating: 4.6, tags: ['热销'], image: '/images/product4.jpg' },
-      { id: 5, name: '舒适棉质居家服', price: 89, originalPrice: 159, sales: 500, rating: 4.5, tags: [], image: '/images/product5.jpg' },
-      { id: 6, name: '潮流运动背包', price: 199, originalPrice: 399, sales: 700, rating: 4.8, tags: ['包邮'], image: '/images/product6.jpg' }
-    ],
+    products: [],
     hasMore: true,
     showFilter: false,
     minPrice: '',
     maxPrice: '',
     brands: ['耐克', '阿迪达斯', '李宁', '安踏', '彪马', '匡威'],
     selectedBrands: [],
-    selectedRating: 0
+    selectedRating: 0,
+    page: 1,
+    pageSize: 20,
+    loading: false,
+    sort: ''
   },
 
   onLoad(options) {
     if (options.category) {
       this.setData({ categoryName: options.category })
     }
-    this.sortProducts()
+    if (options.sort) {
+      this.setData({ 
+        sort: options.sort,
+        activeFilter: options.sort === 'hot' ? 'sales' : options.sort
+      })
+    }
+    this.loadProducts()
+  },
+
+  onShow() {
+    // 每次显示页面时刷新数据
+    this.onPullDownRefresh()
+  },
+
+  // 加载商品列表
+  async loadProducts() {
+    if (this.data.loading) return
+    
+    this.setData({ loading: true })
+    
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'products',
+        data: {
+          page: this.data.page,
+          pageSize: this.data.pageSize,
+          categoryId: this.data.categoryId,
+          keyword: this.data.keyword,
+          sort: this.getSortParam()
+        }
+      })
+      
+      if (res.result && res.result.code === 0) {
+        const newProducts = res.result.data.list || []
+        
+        if (this.data.page === 1) {
+          this.setData({ products: newProducts })
+        } else {
+          this.setData({ products: [...this.data.products, ...newProducts] })
+        }
+        
+        const total = res.result.data.total || 0
+        this.setData({ 
+          hasMore: this.data.products.length < total 
+        })
+      }
+    } catch (err) {
+      console.error('获取商品列表失败:', err)
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
+
+  // 获取排序参数
+  getSortParam() {
+    const { activeFilter, priceSort } = this.data
+    if (activeFilter === 'price') {
+      return priceSort === 'asc' ? 'price_asc' : 'price_desc'
+    }
+    if (activeFilter === 'sales') {
+      return 'sales'
+    }
+    return ''
+  },
+
+  onPullDownRefresh() {
+    this.setData({ page: 1, hasMore: true })
+    this.loadProducts().then(() => {
+      wx.stopPullDownRefresh()
+    })
+  },
+
+  onReachBottom() {
+    if (this.data.hasMore && !this.data.loading) {
+      this.setData({ page: this.data.page + 1 })
+      this.loadProducts()
+    }
   },
 
   goBack() {
@@ -42,39 +115,17 @@ Page({
   selectFilter(e) {
     const type = e.currentTarget.dataset.type
     if (type === 'price') {
-      // 切换价格排序
       const newSort = this.data.priceSort === 'desc' ? 'asc' : 'desc'
       this.setData({
         activeFilter: type,
         priceSort: newSort
       })
-      this.sortProducts()
     } else {
       this.setData({ activeFilter: type })
-      this.sortProducts()
     }
-  },
-
-  sortProducts() {
-    let products = [...this.data.products]
-    const { activeFilter, priceSort } = this.data
-
-    switch(activeFilter) {
-      case 'sales':
-        products.sort((a, b) => b.sales - a.sales)
-        break
-      case 'price':
-        products.sort((a, b) => {
-          return priceSort === 'asc' ? a.price - b.price : b.price - a.price
-        })
-        break
-      case 'all':
-        // 默认排序
-        products.sort((a, b) => b.sales - a.sales)
-        break
-    }
-
-    this.setData({ products })
+    // 重新加载商品
+    this.setData({ page: 1 })
+    this.loadProducts()
   },
 
   openFilterDrawer() {
@@ -123,48 +174,9 @@ Page({
 
   applyFilter() {
     this.closeFilterDrawer()
-    this.applyFilters()
+    this.setData({ page: 1 })
+    this.loadProducts()
     wx.showToast({ title: '筛选已应用', icon: 'success' })
-  },
-
-  applyFilters() {
-    let products = [...this.data.products]
-
-    // 价格筛选
-    if (this.data.minPrice) {
-      products = products.filter(p => p.price >= parseFloat(this.data.minPrice))
-    }
-    if (this.data.maxPrice) {
-      products = products.filter(p => p.price <= parseFloat(this.data.maxPrice))
-    }
-
-    // 评分筛选
-    if (this.data.selectedRating > 0) {
-      products = products.filter(p => p.rating >= this.data.selectedRating)
-    }
-
-    this.setData({ products })
-  },
-
-  onReachBottom() {
-    if (this.data.hasMore) {
-      this.loadMoreProducts()
-    }
-  },
-
-  loadMoreProducts() {
-    // 模拟加载更多
-    wx.showToast({ title: '加载中...', icon: 'loading' })
-    setTimeout(() => {
-      const newProducts = [
-        { id: 7, name: '时尚百搭连衣裙', price: 179, originalPrice: 329, sales: 400, rating: 4.9, tags: ['新品'], image: '/images/product7.jpg' },
-        { id: 8, name: '休闲百搭卫衣', price: 149, originalPrice: 279, sales: 900, rating: 4.7, tags: [], image: '/images/product8.jpg' }
-      ]
-      this.setData({
-        products: [...this.data.products, ...newProducts],
-        hasMore: false
-      })
-    }, 1000)
   },
 
   goToProductDetail(e) {
