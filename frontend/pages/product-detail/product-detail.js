@@ -1,52 +1,106 @@
 Page({
   data: {
     product: {
-      id: 1,
-      name: '夏季新款纯棉T恤',
-      subtitle: '轻薄透气 吸汗排湿 舒适亲肤',
-      price: 99,
-      originalPrice: 199,
-      discount: '5.0折',
-      sales: 1000,
-      rating: 4.8,
-      reviewCount: 200,
-      images: [
-        '/images/product1.jpg',
-        '/images/product2.jpg',
-        '/images/product3.jpg',
-        '/images/product4.jpg',
-        '/images/product5.jpg'
-      ],
-      detailImages: [
-        '/images/detail1.jpg',
-        '/images/detail2.jpg',
-        '/images/detail3.jpg'
-      ],
-      colors: ['红色', '黑色', '白色', '蓝色'],
-      sizes: ['S', 'M', 'L', 'XL', 'XXL']
+      name: '商品',
+      price: 0,
+      originalPrice: 0,
+      images: ['/images/product1.jpg'],
+      colors: [],
+      sizes: []
     },
     selectedColor: '',
     selectedSize: '',
     selectedSpec: '',
     quantity: 1,
     showSpecModal: false,
-    isFavorite: false
+    isFavorite: false,
+    loading: true
   },
 
   onLoad(options) {
     const id = options.id
-    // 根据id加载商品详情
-    console.log('商品ID:', id)
+    console.log('商品详情页加载，商品ID:', id)
+    
+    if (!id) {
+      console.error('商品ID为空')
+      wx.showToast({
+        title: '商品不存在',
+        icon: 'none'
+      })
+      setTimeout(() => {
+        wx.navigateBack()
+      }, 1500)
+      return
+    }
+    
     this.loadProductDetail(id)
   },
 
-  loadProductDetail(id) {
-    // 模拟加载商品详情
-    // 实际项目中应该从接口获取
-    wx.showLoading({ title: '加载中...' })
-    setTimeout(() => {
-      wx.hideLoading()
-    }, 500)
+  // 加载商品详情
+  async loadProductDetail(productId) {
+    this.setData({ loading: true })
+    
+    try {
+      console.log('开始加载商品详情，ID:', productId)
+      
+      const res = await wx.cloud.callFunction({
+        name: 'product-detail',
+        data: {
+          productId: productId
+        }
+      })
+      
+      console.log('商品详情加载结果:', res.result)
+      
+      if (res.result && res.result.code === 0) {
+        const product = res.result.data
+        
+        console.log('商品数据:', product.name, '规格:', product.specs)
+        
+        // 设置商品数据
+        this.setData({
+          product: {
+            productId: product.productId,
+            name: product.name,
+            subtitle: product.description || '',
+            price: product.price,
+            originalPrice: product.originalPrice || 0,
+            discount: product.originalPrice 
+              ? (product.price / product.originalPrice * 10).toFixed(1) + '折'
+              : '',
+            sales: product.sales || 0,
+            rating: product.rating || 5,
+            reviewCount: product.reviewCount || 0,
+            image: product.image || (product.images && product.images[0]) || '/images/product1.jpg',
+            images: product.images && product.images.length > 0 ? product.images : [product.image || '/images/product1.jpg'],
+            detailImages: product.detailImages || [],
+            colors: product.specs?.colors || [],
+            sizes: product.specs?.sizes || [],
+            stock: product.stock || 0
+          },
+          selectedColor: '',
+          selectedSize: '',
+          selectedSpec: '',
+          quantity: 1
+        })
+        
+        console.log('商品数据已设置，规格:', this.data.product.colors, this.data.product.sizes)
+      } else {
+        console.error('获取商品详情失败:', res.result)
+        wx.showToast({
+          title: res.result?.message || '商品不存在',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      console.error('获取商品详情失败:', err)
+      wx.showToast({
+        title: '加载失败，请返回重试',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ loading: false })
+    }
   },
 
   previewImage(e) {
@@ -96,14 +150,30 @@ Page({
   },
 
   confirmSpec() {
-    const { selectedColor, selectedSize } = this.data
-    if (!selectedColor || !selectedSize) {
+    const { selectedColor, selectedSize, product } = this.data
+    
+    // 检查是否需要选择规格
+    const hasColors = product.colors && product.colors.length > 0
+    const hasSizes = product.sizes && product.sizes.length > 0
+    
+    // 如果有颜色选项但未选择
+    if (hasColors && !selectedColor) {
       wx.showToast({
-        title: '请选择完整的规格',
+        title: '请选择颜色',
         icon: 'none'
       })
       return
     }
+    
+    // 如果有尺寸选项但未选择
+    if (hasSizes && !selectedSize) {
+      wx.showToast({
+        title: '请选择尺寸',
+        icon: 'none'
+      })
+      return
+    }
+    
     this.closeSpecSelector()
   },
 
@@ -130,37 +200,43 @@ Page({
   },
 
   addToCart() {
-    if (!this.data.selectedColor || !this.data.selectedSize) {
-      this.openSpecSelector()
-      wx.showToast({
-        title: '请先选择规格',
-        icon: 'none'
-      })
-      return
+    const { selectedColor, selectedSize, product, quantity } = this.data
+    
+    console.log('addToCart 开始执行，商品数据:', product)
+    
+    // 检查是否需要选择规格
+    const hasColors = product.colors && product.colors.length > 0
+    const hasSizes = product.sizes && product.sizes.length > 0
+    
+    // 如果有颜色选项但未选择，自动选择第一个
+    if (hasColors && !selectedColor) {
+      this.setData({ selectedColor: product.colors[0] })
+    }
+    
+    // 如果有尺寸选项但未选择，自动选择第一个
+    if (hasSizes && !selectedSize) {
+      this.setData({ selectedSize: product.sizes[0] })
     }
 
-    // 添加到购物车
     const app = getApp()
-    const cartCount = app.globalData.cartCount + this.data.quantity
+    const cartCount = app.globalData.cartCount + quantity
     app.globalData.cartCount = cartCount
-
-    wx.showToast({
-      title: `已添加${this.data.quantity}件商品到购物车`,
-      icon: 'success'
-    })
 
     // 保存购物车数据到本地存储
     let cart = wx.getStorageSync('cart') || []
+    // 使用转换后的 image 字段，避免使用外部图片链接
     const cartItem = {
-      productId: this.data.product.id,
-      name: this.data.product.name,
-      price: this.data.product.price,
-      image: this.data.product.images[0],
-      color: this.data.selectedColor,
-      size: this.data.selectedSize,
-      quantity: this.data.quantity,
+      productId: product.productId,
+      name: product.name,
+      price: product.price,
+      image: product.image || product.images[0] || '/images/product1.jpg',
+      color: selectedColor || '',
+      size: selectedSize || '',
+      quantity: quantity,
       selected: true
     }
+    
+    console.log('购物车商品项:', cartItem)
 
     // 检查是否已存在相同规格的商品
     const existingIndex = cart.findIndex(item =>
@@ -170,19 +246,42 @@ Page({
     )
 
     if (existingIndex > -1) {
-      cart[existingIndex].quantity += this.data.quantity
+      cart[existingIndex].quantity += quantity
     } else {
       cart.push(cartItem)
     }
 
     wx.setStorageSync('cart', cart)
+    console.log('购物车已保存，当前购物车:', cart)
+    
+    wx.showToast({
+      title: `已添加${quantity}件商品到购物车`,
+      icon: 'success'
+    })
   },
 
   buyNow() {
-    if (!this.data.selectedColor || !this.data.selectedSize) {
+    const { selectedColor, selectedSize, product, quantity } = this.data
+    
+    // 检查是否需要选择规格
+    const hasColors = product.colors && product.colors.length > 0
+    const hasSizes = product.sizes && product.sizes.length > 0
+    
+    // 如果有颜色选项但未选择
+    if (hasColors && !selectedColor) {
       this.openSpecSelector()
       wx.showToast({
-        title: '请先选择规格',
+        title: '请选择颜色',
+        icon: 'none'
+      })
+      return
+    }
+    
+    // 如果有尺寸选项但未选择
+    if (hasSizes && !selectedSize) {
+      this.openSpecSelector()
+      wx.showToast({
+        title: '请选择尺寸',
         icon: 'none'
       })
       return
@@ -205,13 +304,13 @@ Page({
 
     // 创建订单
     const orderItem = {
-      productId: this.data.product.id,
-      name: this.data.product.name,
-      price: this.data.product.price,
-      image: this.data.product.images[0],
-      color: this.data.selectedColor,
-      size: this.data.selectedSize,
-      quantity: this.data.quantity
+      productId: product.productId,
+      name: product.name,
+      price: product.price,
+      image: product.image || product.images[0] || '/images/product1.jpg',
+      color: selectedColor || '',
+      size: selectedSize || '',
+      quantity: quantity
     }
 
     // 保存订单信息

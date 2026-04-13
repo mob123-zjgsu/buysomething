@@ -26,10 +26,10 @@
 
         <view class="cart-item" wx:for="{{item.products}}" wx:for-item="product" wx:key="uniqueId">
           <checkbox class="item-checkbox" checked="{{product.selected}}" bindtap="toggleItemSelect" data-shop-id="{{item.shopId}}" data-product-id="{{product.uniqueId}}" />
-          <image class="product-image" src="{{product.image}}" mode="aspectFill" bindtap="goToProductDetail" data-id="{{product.productId}}"></image>
+          <image class="product-image" src="{{product.image || '/images/product1.jpg'}}" mode="aspectFill" bindtap="goToProductDetail" data-id="{{product.productId}}"></image>
           <view class="product-info">
             <view class="product-name" bindtap="goToProductDetail" data-id="{{product.productId}}">{{product.name}}</view>
-            <view class="product-spec">{{product.color}} / {{product.size}}</view>
+            <view class="product-spec">{{product.color}} {{product.size ? '/ ' + product.size : ''}}</view>
             <view class="product-bottom">
               <text class="product-price">¥{{product.price}}</text>
               <view class="quantity-control">

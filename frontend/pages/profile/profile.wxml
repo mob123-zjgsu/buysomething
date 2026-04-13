@@ -18,7 +18,7 @@
     <view class="user-header">
       <view class="header-bg">
         <view class="header-content">
-          <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" bindtap="editAvatar"></image>
+          <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" bindtap="editAvatar"></image>
           <view class="user-info">
             <text class="user-name">{{userInfo.nickName}}</text>
             <view class="member-tag">
@@ -98,11 +98,22 @@
 
     <!-- 功能列表区 -->
     <view class="function-list">
+      <!-- API 交互测试 - 仅开发调试使用 -->
+      <view class="function-item" style="background: #fff5f5;" bindtap="goToApiTest">
+        <view class="item-left">
+          <text class="item-icon">🧪</text>
+          <text class="item-label" style="color: #ff6b6b;">API 交互测试</text>
+        </view>
+        <view class="item-right">
+          <text class="arrow">›</text>
+        </view>
+      </view>
+
       <!-- 测试按钮 - 仅开发调试使用 -->
       <view class="function-item" style="background: #fff5f5;" bindtap="goToTest">
         <view class="item-left">
-          <text class="item-icon">🧪</text>
-          <text class="item-label" style="color: #ff6b6b;">API 测试</text>
+          <text class="item-icon">🔧</text>
+          <text class="item-label" style="color: #ff6b6b;">自动测试</text>
         </view>
         <view class="item-right">
           <text class="arrow">›</text>

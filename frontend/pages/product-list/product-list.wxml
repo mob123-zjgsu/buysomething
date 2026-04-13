@@ -35,7 +35,7 @@
 
   <!-- 商品网格 -->
   <view class="product-grid">
-    <view class="product-card" wx:for="{{products}}" wx:key="id" bindtap="goToProductDetail" data-id="{{item.id}}">
+    <view class="product-card" wx:for="{{products}}" wx:key="productId" bindtap="goToProductDetail" data-id="{{item.productId}}">
       <image class="product-image" src="{{item.image}}" mode="aspectFill"></image>
       <view class="product-info">
         <text class="product-name">{{item.name}}</text>
