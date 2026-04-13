@@ -80,20 +80,49 @@ Page({
       return
     }
 
-    // 发送验证码
     wx.showLoading({ title: '发送中...' })
 
-    // 模拟发送验证码
-    setTimeout(() => {
-      wx.hideLoading()
-      wx.showToast({
-        title: '验证码已发送',
-        icon: 'success'
-      })
+    // 调用云函数发送验证码
+    wx.cloud.callFunction({
+      name: 'sendSmsCode',
+      data: {
+        phone: phone
+      },
+      success: (res) => {
+        wx.hideLoading()
+        console.log('发送验证码结果:', res)
 
-      // 开始倒计时
-      this.startCountdown()
-    }, 1000)
+        if (res.result && res.result.success) {
+          // 测试环境显示验证码
+          if (res.result.code) {
+            wx.showToast({
+              title: '验证码: ' + res.result.code,
+              icon: 'none',
+              duration: 3000
+            })
+          } else {
+            wx.showToast({
+              title: '验证码已发送',
+              icon: 'success'
+            })
+          }
+          this.startCountdown()
+        } else {
+          wx.showToast({
+            title: res.result?.message || '发送失败',
+            icon: 'none'
+          })
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading()
+        console.error('发送验证码失败:', err)
+        wx.showToast({
+          title: '网络错误，请稍后重试',
+          icon: 'none'
+        })
+      }
+    })
   },
 
   startCountdown() {
@@ -129,42 +158,60 @@ Page({
 
     wx.showLoading({ title: '登录中...' })
 
-    // 模拟登录
-    setTimeout(() => {
-      wx.hideLoading()
+    // 调用云函数进行登录
+    wx.cloud.callFunction({
+      name: 'login',
+      data: {
+        phone: phone,
+        password: password
+      },
+      success: (res) => {
+        wx.hideLoading()
+        console.log('登录结果:', res)
 
-      // 保存用户信息
-      const userInfo = {
-        nickName: '用户' + phone.substring(7),
-        avatarUrl: '/images/default-avatar.png',
-        memberLevel: '普通会员'
-      }
+        if (res.result && res.result.code === 0) {
+          // 登录成功，保存用户信息
+          const userInfo = res.result.data.userInfo
+          this.saveUserInfo(userInfo)
 
-      this.saveUserInfo(userInfo)
+          wx.showToast({
+            title: '登录成功',
+            icon: 'success'
+          })
 
-      wx.showToast({
-        title: '登录成功',
-        icon: 'success'
-      })
-
-      setTimeout(() => {
-        wx.switchTab({
-          url: '/pages/profile/profile',
-          fail: () => {
-            wx.navigateBack()
-          }
+          setTimeout(() => {
+            wx.switchTab({
+              url: '/pages/profile/profile',
+              fail: () => {
+                wx.navigateBack()
+              }
+            })
+          }, 1500)
+        } else {
+          // 登录失败
+          wx.showToast({
+            title: res.result?.message || '登录失败',
+            icon: 'none'
+          })
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading()
+        console.error('登录失败:', err)
+        wx.showToast({
+          title: '网络错误，请稍后重试',
+          icon: 'none'
         })
-      }, 1500)
-    }, 1500)
+      }
+    })
   },
 
   codeLogin() {
     const { phone, code } = this.data
 
-    // 验证验证码
-    if (code !== '123456') {
+    if (!phone || code.length !== 6) {
       wx.showToast({
-        title: '验证码错误',
+        title: '请输入正确的手机号和验证码',
         icon: 'none'
       })
       return
@@ -172,33 +219,53 @@ Page({
 
     wx.showLoading({ title: '登录中...' })
 
-    // 模拟登录
-    setTimeout(() => {
-      wx.hideLoading()
+    // 调用云函数进行登录（验证码登录模式）
+    wx.cloud.callFunction({
+      name: 'login',
+      data: {
+        phone: phone,
+        password: '',  // 验证码登录不需要密码
+        code: code
+      },
+      success: (res) => {
+        wx.hideLoading()
+        console.log('登录结果:', res)
 
-      // 保存用户信息
-      const userInfo = {
-        nickName: '用户' + phone.substring(7),
-        avatarUrl: '/images/default-avatar.png',
-        memberLevel: '普通会员'
-      }
+        if (res.result && res.result.code === 0) {
+          // 登录成功，保存用户信息
+          const userInfo = res.result.data.userInfo
+          this.saveUserInfo(userInfo)
 
-      this.saveUserInfo(userInfo)
+          wx.showToast({
+            title: '登录成功',
+            icon: 'success'
+          })
 
-      wx.showToast({
-        title: '登录成功',
-        icon: 'success'
-      })
-
-      setTimeout(() => {
-        wx.switchTab({
-          url: '/pages/profile/profile',
-          fail: () => {
-            wx.navigateBack()
-          }
+          setTimeout(() => {
+            wx.switchTab({
+              url: '/pages/profile/profile',
+              fail: () => {
+                wx.navigateBack()
+              }
+            })
+          }, 1500)
+        } else {
+          // 登录失败
+          wx.showToast({
+            title: res.result?.message || '登录失败',
+            icon: 'none'
+          })
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading()
+        console.error('登录失败:', err)
+        wx.showToast({
+          title: '网络错误，请稍后重试',
+          icon: 'none'
         })
-      }, 1500)
-    }, 1500)
+      }
+    })
   },
 
   saveUserInfo(userInfo) {
@@ -206,8 +273,19 @@ Page({
     app.globalData.isLogin = true
     app.globalData.userInfo = userInfo
 
+    // 保存用户信息
     wx.setStorageSync('userInfo', userInfo)
-    wx.setStorageSync('token', 'mock_token_' + Date.now())
+    wx.setStorageSync('isLogin', true)
+
+    // 如果有token也保存
+    if (userInfo.token) {
+      wx.setStorageSync('token', userInfo.token)
+    }
+
+    // 保存手机号（用于后续查询）
+    if (userInfo.phone) {
+      wx.setStorageSync('phone', userInfo.phone)
+    }
   },
 
   forgetPassword() {

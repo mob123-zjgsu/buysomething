@@ -67,12 +67,14 @@
         <view class="spec-info">
           <text class="spec-price">¥{{product.price}}</text>
           <text class="spec-selected">{{selectedSpec || '请选择规格'}}</text>
+          <text class="spec-stock" wx:if="{{product.stock > 0}}">库存: {{product.stock}}件</text>
+          <text class="spec-stock no-stock" wx:else>库存不足</text>
         </view>
       </view>
 
       <scroll-view scroll-y class="modal-body">
         <!-- 颜色选择 -->
-        <view class="spec-group" wx:if="{{product.colors}}">
+        <view class="spec-group" wx:if="{{product.colors.length > 0}}">
           <view class="spec-group-title">颜色</view>
           <view class="spec-options">
             <view class="spec-option {{selectedColor === item ? 'active' : ''}}" wx:for="{{product.colors}}" wx:key="*this" bindtap="selectColor" data-color="{{item}}">
@@ -82,13 +84,18 @@
         </view>
 
         <!-- 尺寸选择 -->
-        <view class="spec-group" wx:if="{{product.sizes}}">
+        <view class="spec-group" wx:if="{{product.sizes.length > 0}}">
           <view class="spec-group-title">尺寸</view>
           <view class="spec-options">
             <view class="spec-option {{selectedSize === item ? 'active' : ''}}" wx:for="{{product.sizes}}" wx:key="*this" bindtap="selectSize" data-size="{{item}}">
               <text>{{item}}</text>
             </view>
           </view>
+        </view>
+
+        <!-- 无规格时提示 -->
+        <view class="no-spec-tip" wx:if="{{product.colors.length === 0 && product.sizes.length === 0}}">
+          <text>该商品暂无规格选项</text>
         </view>
 
         <!-- 数量选择 -->

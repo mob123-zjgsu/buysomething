@@ -77,6 +77,13 @@ Page({
     })
   },
 
+  // 跳转到 API 交互测试页面
+  goToApiTest() {
+    wx.navigateTo({
+      url: '/pages/api-test/api-test'
+    })
+  },
+
   editProfile() {
     wx.showToast({ title: '编辑资料', icon: 'none' })
   },
