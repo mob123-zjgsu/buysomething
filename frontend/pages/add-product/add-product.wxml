@@ -1,0 +1,25 @@
+<view class="add-product">
+  <view class="form">
+    <view class="form-item">
+      <text class="label">商品名称</text>
+      <input class="input" placeholder="请输入商品名称" bindinput="onNameInput" value="{{name}}" />
+    </view>
+    <view class="form-item">
+      <text class="label">商品价格</text>
+      <input class="input" type="digit" placeholder="请输入价格" bindinput="onPriceInput" value="{{price}}" />
+    </view>
+    <view class="form-item">
+      <text class="label">商品描述</text>
+      <textarea class="textarea" placeholder="请输入商品描述" bindinput="onDescInput" value="{{description}}"></textarea>
+    </view>
+    <view class="form-item">
+      <text class="label">商品图片URL</text>
+      <input class="input" placeholder="请输入图片链接" bindinput="onImageInput" value="{{image}}" />
+    </view>
+    <view class="form-item">
+      <text class="label">库存数量</text>
+      <input class="input" type="number" placeholder="请输入库存" bindinput="onStockInput" value="{{stock}}" />
+    </view>
+    <button class="btn" bindtap="onSubmit">提交审核</button>
+  </view>
+</view>

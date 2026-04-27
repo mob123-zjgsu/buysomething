@@ -108,4 +108,24 @@
       <text class="agreement-link" bindtap="viewPrivacy">《隐私政策》</text>
     </view>
   </view>
+
+  <!-- 商家/管理员入口 -->
+  <view class="other-login">
+    <view class="divider">
+      <view class="divider-line"></view>
+      <text class="divider-text">商家/管理入口</text>
+      <view class="divider-line"></view>
+    </view>
+
+    <view class="other-btns">
+      <view class="other-btn merchant" bindtap="goToMerchantLogin">
+        <text class="other-icon">🏪</text>
+        <text class="other-text">商家登录</text>
+      </view>
+      <view class="other-btn admin" bindtap="goToAdminLogin">
+        <text class="other-icon">🔐</text>
+        <text class="other-text">管理登录</text>
+      </view>
+    </view>
+  </view>
 </view>

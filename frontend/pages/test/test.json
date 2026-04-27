@@ -1,5 +1,7 @@
 {
-  "navigationBarTitleText": "API 测试",
+  "navigationBarTitleText": "API 自动测试",
+  "navigationBarBackgroundColor": "#FF6B6B",
+  "navigationBarTextStyle": "white",
   "enablePullDownRefresh": false,
   "backgroundTextStyle": "dark"
 }

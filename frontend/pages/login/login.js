@@ -362,6 +362,18 @@ Page({
     })
   },
 
+  goToMerchantLogin() {
+    wx.navigateTo({
+      url: '/pages/merchant-login/merchant-login'
+    })
+  },
+
+  goToAdminLogin() {
+    wx.navigateTo({
+      url: '/pages/admin-login/admin-login'
+    })
+  },
+
   goBack() {
     wx.navigateBack({
       fail: () => {

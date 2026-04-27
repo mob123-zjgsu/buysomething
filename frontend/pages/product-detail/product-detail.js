@@ -178,14 +178,18 @@ Page({
   },
 
   contactService() {
-    wx.showModal({
-      title: '联系客服',
-      content: '确定要联系客服吗？',
-      success(res) {
-        if (res.confirm) {
-          wx.showToast({ title: '正在连接客服...', icon: 'loading' })
-        }
-      }
+    // 跳转到智能客服页面，携带商品信息
+    const productInfo = {
+      name: this.data.product.name,
+      price: this.data.product.price,
+      image: this.data.product.image,
+      colors: this.data.product.colors,
+      sizes: this.data.product.sizes,
+      subtitle: this.data.product.subtitle
+    }
+    
+    wx.navigateTo({
+      url: `/pages/chat/chat?productInfo=${encodeURIComponent(JSON.stringify(productInfo))}`
     })
   },
 

@@ -1,0 +1,105 @@
+.merchant-register {
+  min-height: 100vh;
+  background-color: #FFFFFF;
+  padding: 0 48rpx;
+}
+
+.back-btn {
+  position: absolute;
+  top: 40rpx;
+  left: 32rpx;
+  font-size: 56rpx;
+  color: #333333;
+}
+
+.header-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 100rpx;
+  margin-bottom: 60rpx;
+}
+
+.header-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.header-title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.register-form {
+  margin-bottom: 40rpx;
+}
+
+.input-group {
+  margin-bottom: 28rpx;
+}
+
+.input-label {
+  font-size: 26rpx;
+  color: #666666;
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 24rpx;
+  background-color: #F5F5F5;
+  border-radius: 44rpx;
+}
+
+.input-icon {
+  font-size: 32rpx;
+  margin-right: 16rpx;
+}
+
+.input-field {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.eye-icon {
+  font-size: 36rpx;
+  color: #999999;
+}
+
+.btn-register {
+  width: 100%;
+  height: 96rpx;
+  line-height: 96rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #FFFFFF;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+  margin-top: 20rpx;
+}
+
+.btn-register.disabled {
+  background: #CCCCCC;
+}
+
+.tips {
+  margin-top: 32rpx;
+  text-align: center;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #FF9800;
+}

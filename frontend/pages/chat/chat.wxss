@@ -1,0 +1,377 @@
+/* pages/chat/chat.wxss */
+
+.chat-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 顶部导航 */
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  padding: 0 24rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.header-left,
+.header-right {
+  width: 80rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-back {
+  font-size: 48rpx;
+  font-weight: bold;
+}
+
+.icon-more {
+  font-size: 36rpx;
+}
+
+.header-title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-text {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.ai-status {
+  font-size: 22rpx;
+  opacity: 0.85;
+  margin-top: 4rpx;
+}
+
+/* 商品卡片 */
+.product-card {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+  flex-shrink: 0;
+}
+
+.product-image {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+}
+
+.product-info {
+  margin-left: 20rpx;
+  flex: 1;
+  overflow: hidden;
+}
+
+.product-name {
+  font-size: 28rpx;
+  color: #333;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-price {
+  font-size: 30rpx;
+  color: #ff4757;
+  font-weight: 600;
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* 消息列表 */
+.message-list {
+  flex: 1;
+  padding: 24rpx;
+  overflow-anchor: auto;
+}
+
+/* 消息行 */
+.message-row {
+  display: flex;
+  margin-bottom: 32rpx;
+  align-items: flex-start;
+}
+
+.message-row.user {
+  flex-direction: row-reverse;
+}
+
+.message-row .avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-ai {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.avatar-user {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.avatar-text {
+  font-size: 36rpx;
+}
+
+/* 消息内容 */
+.message-content {
+  max-width: 520rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
+  position: relative;
+  margin: 0 20rpx;
+  word-break: break-all;
+}
+
+.message-content.assistant {
+  background: #fff;
+  color: #333;
+  border-top-left-radius: 8rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.message-content.user {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-top-right-radius: 8rpx;
+}
+
+.message-text {
+  font-size: 28rpx;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.message-time {
+  font-size: 20rpx;
+  color: #999;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.message-content.user .message-time {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: right;
+}
+
+/* 系统消息 */
+.system-message {
+  text-align: center;
+  margin: 24rpx 0;
+}
+
+.system-text {
+  font-size: 24rpx;
+  color: #999;
+  background: #f0f0f0;
+  padding: 12rpx 24rpx;
+  border-radius: 20rpx;
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+/* 加载动画 */
+.loading-content {
+  min-width: 100rpx;
+  padding: 24rpx 32rpx;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 8rpx;
+  justify-content: center;
+  align-items: center;
+}
+
+.dot {
+  width: 12rpx;
+  height: 12rpx;
+  background: #999;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* 快捷问题 */
+.quick-questions {
+  padding: 16rpx 24rpx;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.quick-title {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 12rpx;
+}
+
+.quick-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.quick-item {
+  font-size: 24rpx;
+  color: #667eea;
+  background: #fff;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  border: 1rpx solid #667eea;
+}
+
+/* 输入区域 */
+.input-area {
+  background: #fff;
+  padding: 16rpx 24rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  flex-shrink: 0;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.transfer-btn {
+  font-size: 24rpx;
+  color: #667eea;
+  padding: 16rpx 20rpx;
+  background: #f0edff;
+  border-radius: 32rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.message-input {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 24rpx;
+  background: #f5f5f5;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+}
+
+.send-btn {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.send-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.send-icon {
+  font-size: 32rpx;
+  color: #fff;
+}
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  width: 560rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+  padding: 32rpx 24rpx 24rpx;
+  color: #333;
+}
+
+.modal-body {
+  padding: 0 48rpx 32rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.modal-tip {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.modal-footer {
+  display: flex;
+  border-top: 1rpx solid #eee;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+}
+
+.modal-btn.cancel {
+  color: #666;
+  border-right: 1rpx solid #eee;
+}
+
+.modal-btn.confirm {
+  color: #667eea;
+  font-weight: 600;
+}

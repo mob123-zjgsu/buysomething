@@ -1,0 +1,15 @@
+.admin-merchants { min-height: 100vh; background: #F5F5F5; }
+.tabs { display: flex; background: #FFF; padding: 20rpx 0; }
+.tab { flex: 1; text-align: center; font-size: 28rpx; color: #666; padding: 16rpx 0; }
+.tab.active { color: #667eea; border-bottom: 4rpx solid #667eea; }
+.list { padding: 20rpx; }
+.item { background: #FFF; border-radius: 16rpx; padding: 24rpx; margin-bottom: 20rpx; display: flex; justify-content: space-between; align-items: center; }
+.info { flex: 1; }
+.name { font-size: 32rpx; font-weight: bold; display: block; }
+.desc, .phone { font-size: 24rpx; color: #999; display: block; margin-top: 8rpx; }
+.actions { display: flex; gap: 16rpx; }
+.btn { padding: 16rpx 32rpx; border-radius: 32rpx; font-size: 24rpx; }
+.btn.approve { background: #E8F5E9; color: #4CAF50; }
+.btn.reject { background: #FFEBEE; color: #F44336; }
+.btn.delete { background: #FFEBEE; color: #F44336; }
+.empty { text-align: center; padding: 100rpx; color: #999; font-size: 28rpx; }
