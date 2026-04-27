@@ -89,10 +89,16 @@ exports.main = async (event, context) => {
 
       for (const item of items) {
         try {
-          const product = await db.collection('products').doc(item.productId).get();
-          if (product.data.length === 0) continue;
+          // 使用 where 查询，避免无效 ID 格式错误
+          const productResult = await db.collection('products').where({
+            _id: item.productId
+          }).get();
           
-          const p = product.data[0];
+          if (!productResult.data || productResult.data.length === 0) {
+            continue;
+          }
+          
+          const p = productResult.data[0];
           const itemAmount = p.price * item.quantity;
           totalAmount += itemAmount;
 
