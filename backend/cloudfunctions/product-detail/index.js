@@ -37,11 +37,13 @@ exports.main = async (event, context) => {
       return result;
     }
 
-    const queryResult = await db.collection('products').doc(productId).get();
+    // 使用 where 查询而非 doc，避免无效 ID 格式错误
+    const queryResult = await db.collection('products').where({
+      _id: productId
+    }).get();
     
-    // 兼容不同版本的返回格式
-    const productData = queryResult.data || queryResult || [];
-    const product = Array.isArray(productData) ? productData[0] : productData;
+    const productList = queryResult.data || [];
+    const product = productList.length > 0 ? productList[0] : null;
 
     if (!product) {
       const result = { code: 1004, message: '商品不存在', data: {} };
