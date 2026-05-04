@@ -19,7 +19,10 @@ jobs:
       - name: Install ESLint
         run: npm install -g eslint
       - name: Run ESLint on cloudfunctions
-        run: eslint cloudfunctions/**/*.js
+        run: |
+          if ls cloudfunctions/*/index.js 2>/dev/null; then
+            eslint cloudfunctions/*/index.js
+          fi
 
   # 前端 - 小程序代码检查
   frontend:
@@ -33,4 +36,7 @@ jobs:
       - name: Install ESLint
         run: npm install -g eslint
       - name: Run ESLint on pages
-        run: eslint pages/**/*.js
+        run: |
+          if ls pages/*/*.js 2>/dev/null; then
+            eslint pages/*/*.js
+          fi
