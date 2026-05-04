@@ -1,6 +1,6 @@
 \# 购物微信小程序buysomething
 
-\[!\[CI](https://github.com/mob123-zjgsu/buysomething/actions/workflows/ci.yml/badge.svg)](https://github.com/mob123-zjgsu/buysomething/actions)
+[![CI](https://github.com/mob123-zjgsu/buysomething/actions/workflows/ci.yml/badge.svg)](https://github.com/mob123-zjgsu/buysomething/actions)
 
 \## 项目简介
 
