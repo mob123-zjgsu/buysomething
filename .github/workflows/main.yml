@@ -7,22 +7,30 @@ on:
     branches: [main]
 
 jobs:
+  # 后端 - 云函数代码检查
   backend:
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm ci
-      - run: npm run lint
+      - name: Install ESLint
+        run: npm install -g eslint
+      - name: Run ESLint on cloudfunctions
+        run: eslint cloudfunctions/**/*.js
 
+  # 前端 - 小程序代码检查
   frontend:
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm ci
-      - run: npm run lint
+      - name: Install ESLint
+        run: npm install -g eslint
+      - name: Run ESLint on pages
+        run: eslint pages/**/*.js
