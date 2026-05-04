@@ -1,0 +1,65 @@
+<!-- 商家端主页 -->
+<view class="merchant-home">
+  <!-- 顶部信息 -->
+  <view class="merchant-header">
+    <view class="merchant-info">
+      <text class="merchant-name">{{merchantName}}</text>
+      <text class="merchant-status">已认证商家</text>
+    </view>
+    <view class="logout-btn" bindtap="onLogout">退出</view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-item" bindtap="onAddProduct">
+      <view class="menu-icon">📦</view>
+      <text class="menu-text">上架商品</text>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <view class="menu-item" bindtap="onMyProducts">
+      <view class="menu-icon">📋</view>
+      <text class="menu-text">我的商品</text>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <view class="menu-item" bindtap="onOrderList">
+      <view class="menu-icon">📑</view>
+      <text class="menu-text">订单管理</text>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <view class="menu-item" bindtap="onStatistics">
+      <view class="menu-icon">📊</view>
+      <text class="menu-text">销售统计</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 商品列表（简化版） -->
+  <view class="product-section">
+    <view class="section-header">
+      <text class="section-title">最近上架的商品</text>
+      <text class="section-more" bindtap="onMyProducts">查看全部 ›</text>
+    </view>
+
+    <view class="product-list" wx:if="{{products.length > 0}}">
+      <view class="product-item" wx:for="{{products}}" wx:key="productId" bindtap="onEditProduct" data-id="{{item.productId}}">
+        <image class="product-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="product-info">
+          <text class="product-name">{{item.name}}</text>
+          <text class="product-price">¥{{item.price}}</text>
+        </view>
+        <view class="product-status {{item.status === 1 ? 'approved' : 'pending'}}">
+          {{item.status === 1 ? '已上架' : '待审核'}}
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">📦</text>
+      <text class="empty-text">暂无商品</text>
+      <button class="btn-add" bindtap="onAddProduct">立即上架</button>
+    </view>
+  </view>
+</view>

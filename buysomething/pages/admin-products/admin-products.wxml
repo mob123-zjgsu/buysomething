@@ -1,0 +1,21 @@
+<view class="admin-products">
+  <view class="tabs">
+    <view class="tab {{tab === 'pending' ? 'active' : ''}}" bindtap="switchTab" data-tab="pending">待审核</view>
+    <view class="tab {{tab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">全部商品</view>
+  </view>
+  <view class="list">
+    <view class="item" wx:for="{{list}}" wx:key="_id">
+      <image class="img" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="info">
+        <text class="name">{{item.name}}</text>
+        <text class="price">¥{{item.price}}</text>
+      </view>
+      <view class="actions" wx:if="{{tab === 'pending'}}">
+        <view class="btn approve" bindtap="approve" data-id="{{item._id}}">通过</view>
+        <view class="btn reject" bindtap="reject" data-id="{{item._id}}">拒绝</view>
+      </view>
+      <view class="btn delete" wx:if="{{tab === 'all'}}" bindtap="deleteProduct" data-id="{{item._id}}">删除</view>
+    </view>
+    <view class="empty" wx:if="{{list.length === 0}}">暂无数据</view>
+  </view>
+</view>

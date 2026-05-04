@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="header">
+    <text class="title">API 自动测试</text>
+    <button class="refresh-btn" bindtap="refreshTest">刷新测试</button>
+  </view>
+
+  <!-- 状态 -->
+  <view class="status-bar">
+    <text class="status-text">状态: {{testing ? '测试中...' : (finished ? '已完成' : '等待中')}}</text>
+    <text class="status-count">已测试: {{testResults.length}} / {{totalTests}}</text>
+  </view>
+
+  <!-- 日志区域 -->
+  <view class="log-section">
+    <text class="section-title">📋 测试日志</text>
+    <scroll-view scroll-y class="log-container">
+      <view wx:for="{{logs}}" wx:key="index" class="log-item {{item.type}}">
+        <text>{{item.text}}</text>
+      </view>
+      <view wx:if="{{logs.length === 0}}" class="log-empty">
+        <text>点击"刷新测试"开始运行测试</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 测试结果 -->
+  <view class="result-section">
+    <text class="section-title">📊 测试结果</text>
+    
+    <view wx:if="{{testResults.length === 0}}" class="result-empty">
+      <text>暂无测试结果</text>
+    </view>
+    
+    <view wx:for="{{testResults}}" wx:key="index" class="result-item">
+      <view class="result-header">
+        <text class="result-name">{{item.name}}</text>
+        <text class="result-status {{item.success ? 'success' : 'error'}}">
+          {{item.success ? '✅ 成功' : '❌ 失败'}}
+        </text>
+      </view>
+      <text class="result-message">{{item.message}}</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,23 @@
+<view class="empty-state">
+  <!-- 图片 -->
+  <image 
+    class="empty-image" 
+    src="{{image || defaultImages[type] || '/images/empty-cart.png'}}" 
+    mode="aspectFit"
+  />
+
+  <!-- 标题 -->
+  <text class="empty-title">{{title || defaultTitles[type]}}</text>
+
+  <!-- 描述 -->
+  <text class="empty-description" wx:if="{{description}}">{{description}}</text>
+
+  <!-- 操作按钮 -->
+  <button 
+    class="empty-button" 
+    wx:if="{{buttonText}}"
+    bindtap="onButtonTap"
+  >
+    {{buttonText}}
+  </button>
+</view>

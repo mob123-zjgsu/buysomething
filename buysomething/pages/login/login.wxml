@@ -1,0 +1,131 @@
+<view class="login-container">
+  <!-- 返回按钮 -->
+  <view class="back-btn" bindtap="goBack">
+    <text>‹</text>
+  </view>
+
+  <!-- Logo区域 -->
+  <view class="logo-section">
+    <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+    <text class="welcome-title">欢迎回来</text>
+    <text class="welcome-subtitle">登录你的账号继续购物</text>
+  </view>
+
+  <!-- 登录表单 -->
+  <view class="login-form">
+    <!-- 账号密码登录 -->
+    <view class="form-section password-login" wx:if="{{loginType === 'password'}}">
+      <view class="input-group">
+        <view class="input-wrapper">
+          <text class="input-icon">📱</text>
+          <input class="input-field" type="number" placeholder="请输入手机号" maxlength="11" bindinput="onPhoneInput" value="{{phone}}" />
+        </view>
+      </view>
+
+      <view class="input-group">
+        <view class="input-wrapper">
+          <text class="input-icon">🔒</text>
+          <input class="input-field" type="{{showPassword ? 'text' : 'password'}}" placeholder="请输入密码" bindinput="onPasswordInput" value="{{password}}" />
+          <text class="eye-icon" bindtap="togglePassword">
+            {{showPassword ? '👁️' : '👁️‍🗨️'}}
+          </text>
+        </view>
+      </view>
+
+      <view class="form-actions">
+        <text class="link-text" bindtap="forgetPassword">忘记密码?</text>
+      </view>
+
+      <button class="btn-login {{!canLogin ? 'disabled' : ''}}" disabled="{{!canLogin}}" bindtap="passwordLogin">
+        登录
+      </button>
+    </view>
+
+    <!-- 验证码登录 -->
+    <view class="form-section code-login" wx:else>
+      <view class="input-group">
+        <view class="input-wrapper">
+          <text class="input-icon">📱</text>
+          <input class="input-field" type="number" placeholder="请输入手机号" maxlength="11" bindinput="onPhoneInput" value="{{phone}}" />
+        </view>
+      </view>
+
+      <view class="input-group">
+        <view class="input-wrapper">
+          <text class="input-icon">🔢</text>
+          <input class="input-field" type="number" placeholder="请输入验证码" maxlength="6" bindinput="onCodeInput" value="{{code}}" />
+          <button class="btn-code {{countdown > 0 ? 'countdown' : ''}}" bindtap="sendCode" disabled="{{countdown > 0}}">
+            <text wx:if="{{countdown > 0}}">{{countdown}}s后重试</text>
+            <text wx:else>获取验证码</text>
+          </button>
+        </view>
+      </view>
+
+      <button class="btn-login {{!canCodeLogin ? 'disabled' : ''}}" disabled="{{!canCodeLogin}}" bindtap="codeLogin">
+        登录
+      </button>
+    </view>
+
+    <!-- 切换登录方式 -->
+    <view class="switch-login">
+      <text class="switch-text" bindtap="switchLoginType">
+        {{loginType === 'password' ? '验证码登录' : '密码登录'}}
+      </text>
+    </view>
+
+    <!-- 注册 -->
+    <view class="register-section">
+      <text class="register-text">还没有账号?</text>
+      <text class="register-link" bindtap="goToRegister">立即注册</text>
+    </view>
+  </view>
+
+  <!-- 第三方登录 -->
+  <view class="third-party-login">
+    <view class="divider">
+      <view class="divider-line"></view>
+      <text class="divider-text">或使用其他方式登录</text>
+      <view class="divider-line"></view>
+    </view>
+
+    <view class="third-party-icons">
+      <view class="third-party-btn" bindtap="wechatLogin">
+        <text class="third-party-icon wechat">💬</text>
+      </view>
+      <view class="third-party-btn" bindtap="qqLogin">
+        <text class="third-party-icon qq">🐧</text>
+      </view>
+      <view class="third-party-btn" bindtap="weiboLogin">
+        <text class="third-party-icon weibo">📱</text>
+      </view>
+    </view>
+
+    <!-- 用户协议 -->
+    <view class="agreement">
+      <text class="agreement-text">登录即表示同意</text>
+      <text class="agreement-link" bindtap="viewAgreement">《用户协议》</text>
+      <text class="agreement-text">和</text>
+      <text class="agreement-link" bindtap="viewPrivacy">《隐私政策》</text>
+    </view>
+  </view>
+
+  <!-- 商家/管理员入口 -->
+  <view class="other-login">
+    <view class="divider">
+      <view class="divider-line"></view>
+      <text class="divider-text">商家/管理入口</text>
+      <view class="divider-line"></view>
+    </view>
+
+    <view class="other-btns">
+      <view class="other-btn merchant" bindtap="goToMerchantLogin">
+        <text class="other-icon">🏪</text>
+        <text class="other-text">商家登录</text>
+      </view>
+      <view class="other-btn admin" bindtap="goToAdminLogin">
+        <text class="other-icon">🔐</text>
+        <text class="other-text">管理登录</text>
+      </view>
+    </view>
+  </view>
+</view>

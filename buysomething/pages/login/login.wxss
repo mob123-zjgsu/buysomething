@@ -1,0 +1,274 @@
+.login-container {
+  min-height: 100vh;
+  background-color: #FFFFFF;
+  padding: 0 48rpx;
+}
+
+/* 返回按钮 */
+.back-btn {
+  position: absolute;
+  top: 40rpx;
+  left: 32rpx;
+  font-size: 56rpx;
+  color: #333333;
+  z-index: 10;
+}
+
+/* Logo区域 */
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120rpx;
+  margin-bottom: 80rpx;
+}
+
+.logo {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+  margin-bottom: 32rpx;
+}
+
+.welcome-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 12rpx;
+}
+
+.welcome-subtitle {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* 登录表单 */
+.login-form {
+  margin-bottom: 80rpx;
+}
+
+.form-section {
+  margin-bottom: 40rpx;
+}
+
+.input-group {
+  margin-bottom: 32rpx;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  height: 96rpx;
+  padding: 0 24rpx;
+  background-color: #F5F5F5;
+  border-radius: 48rpx;
+}
+
+.input-icon {
+  font-size: 36rpx;
+  margin-right: 16rpx;
+}
+
+.input-field {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.input-field::placeholder {
+  color: #CCCCCC;
+}
+
+.eye-icon {
+  font-size: 36rpx;
+  color: #999999;
+  cursor: pointer;
+}
+
+/* 验证码按钮 */
+.btn-code {
+  padding: 16rpx 24rpx;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  color: #FFFFFF;
+  border-radius: 32rpx;
+  font-size: 24rpx;
+  border: none;
+}
+
+.btn-code.countdown {
+  background: #CCCCCC;
+}
+
+/* 表单操作 */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 40rpx;
+}
+
+.link-text {
+  font-size: 28rpx;
+  color: #FF6B6B;
+}
+
+/* 登录按钮 */
+.btn-login {
+  width: 100%;
+  height: 96rpx;
+  line-height: 96rpx;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  color: #FFFFFF;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  border: none;
+  font-weight: 500;
+}
+
+.btn-login.disabled {
+  background: #CCCCCC;
+}
+
+/* 切换登录方式 */
+.switch-login {
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.switch-text {
+  font-size: 28rpx;
+  color: #FF6B6B;
+}
+
+/* 注册区域 */
+.register-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28rpx;
+}
+
+.register-text {
+  color: #999999;
+  margin-right: 8rpx;
+}
+
+.register-link {
+  color: #FF6B6B;
+}
+
+/* 第三方登录 */
+.third-party-login {
+  margin-top: 80rpx;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 48rpx;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1rpx;
+  background-color: #EEEEEE;
+}
+
+.divider-text {
+  padding: 0 24rpx;
+  font-size: 24rpx;
+  color: #CCCCCC;
+}
+
+.third-party-icons {
+  display: flex;
+  justify-content: center;
+  gap: 64rpx;
+  margin-bottom: 48rpx;
+}
+
+.third-party-btn {
+  width: 96rpx;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F5F5F5;
+  border-radius: 50%;
+}
+
+.third-party-icon {
+  font-size: 48rpx;
+}
+
+.third-party-icon.wechat {
+  color: #07C160;
+}
+
+.third-party-icon.qq {
+  color: #1296DB;
+}
+
+.third-party-icon.weibo {
+  color: #E6162D;
+}
+
+/* 用户协议 */
+.agreement {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24rpx;
+}
+
+.agreement-text {
+  color: #999999;
+}
+
+.agreement-link {
+  color: #FF6B6B;
+  margin: 0 4rpx;
+}
+
+/* 其他登录入口 */
+.other-login {
+  margin-top: 40rpx;
+}
+
+.other-btns {
+  display: flex;
+  justify-content: center;
+  gap: 40rpx;
+}
+
+.other-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx 40rpx;
+  background: #F9F9F9;
+  border-radius: 16rpx;
+}
+
+.other-btn.merchant {
+  background: #F0EDFF;
+}
+
+.other-btn.admin {
+  background: #1a1a2e;
+}
+
+.other-icon {
+  font-size: 40rpx;
+  margin-bottom: 8rpx;
+}
+
+.other-text {
+  font-size: 24rpx;
+  color: #333333;
+}
+
+.other-btn.admin .other-text {
+  color: #FFFFFF;
+}

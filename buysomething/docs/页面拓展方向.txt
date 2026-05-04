@@ -1,0 +1,166 @@
+# 小程序页面拓展方向分析报告
+
+## 一、已完成的可交互 API 接口
+
+### API 交互测试页面 (pages/api-test/api-test)
+**入口**: "我的"页面 → "API 交互测试"
+
+| 序号 | API 名称 | 云函数 | 功能说明 | 参数 |
+|------|---------|--------|---------|------|
+| 1 | 用户注册 | register | 注册新用户 | phone, code, password |
+| 2 | 用户登录 | login | 用户登录验证 | phone, password |
+| 3 | 获取商品列表 | products | 获取商品分页列表 | page, pageSize |
+| 4 | 获取商品详情 | product-detail | 获取单个商品详情 | productId |
+| 5 | 删除商品 | delete-product | 删除指定商品 | productId |
+
+### 自动测试页面 (pages/test/test)
+**入口**: "我的"页面 → "自动测试"
+
+自动测试以下接口:
+1. 用户登录 (login)
+2. 获取商品列表 (products)
+3. 获取商品详情 (product-detail)
+4. 添加购物车 (cart - add)
+5. 获取购物车 (cart - list)
+6. 创建订单 (orders - create)
+7. 获取订单列表 (orders - list)
+
+---
+
+## 二、需要完善的页面导航功能
+
+### "我的"页面 (profile) - 点击只显示 Toast，未跳转到实际页面
+
+| 功能 | 当前状态 | 建议处理 |
+|------|---------|---------|
+| 收藏 (goToFavorites) | wx.showToast | 需要创建 pages/favorites/favorites 页面 |
+| 关注 (goToFollows) | wx.showToast | 需要创建 pages/follows/follows 页面 |
+| 粉丝 (goToFans) | wx.showToast | 需要创建 pages/fans/fans 页面 |
+| 优惠券 (goToCoupons) | wx.showToast | 需要创建 pages/coupons/coupons 页面 |
+| 设置 (goToSettings) | wx.showToast | 需要创建 pages/settings/settings 页面 |
+| 编辑资料 (editProfile) | wx.showToast | 需要创建 pages/edit-profile/edit-profile 页面 |
+| 联系客服 (contactService) | showModal | 可对接真实客服系统或客服小程序 |
+
+### 商品详情页 (product-detail) - 收藏功能只显示 Toast
+
+| 功能 | 当前状态 | 建议处理 |
+|------|---------|---------|
+| 收藏 (toggleFavorite) | 只保存本地状态 | 需要创建收藏云函数，同步到数据库 |
+| 联系客服 (contactService) | showModal | 同上 |
+
+---
+
+## 三、新页面开发计划
+
+### 高优先级（核心功能）
+
+1. **pages/favorites/favorites** - 我的收藏
+   - 展示用户收藏的商品列表
+   - 支持取消收藏
+   - 点击跳转到商品详情
+
+2. **pages/follows/follows** - 我的关注
+   - 展示关注的店铺/品牌
+   - 关注/取关功能
+
+3. **pages/fans/fans** - 我的粉丝（可选，电商小程序通常不需要）
+
+4. **pages/coupons/coupons** - 我的优惠券
+   - 展示可用/已使用/已过期优惠券
+   - 领取优惠券入口
+
+5. **pages/settings/settings** - 设置页面
+   - 通知设置
+   - 隐私设置
+   - 关于我们
+   - 清除缓存
+
+### 中优先级（增强体验）
+
+6. **pages/edit-profile/edit-profile** - 编辑个人资料
+   - 修改昵称
+   - 修改头像
+   - 修改性别、生日等
+
+7. **pages/address-list/address-list** - 地址管理列表（目前只有单个地址页）
+
+8. **pages/search/search** - 搜索页面（可替代弹窗搜索）
+
+### 低优先级（高级功能）
+
+9. **pages/points-mall/points-mall** - 积分商城
+10. **pages/invite-friend/invite-friend** - 邀请好友
+11. **pages/help-center/help-center** - 帮助中心
+
+---
+
+## 三、云函数开发建议
+
+### 新增云函数
+
+1. **favorite-add** - 添加收藏
+   - 参数：productId
+   - 逻辑：检查是否已收藏，添加到 favorites 集合
+
+2. **favorite-remove** - 取消收藏
+   - 参数：favoriteId 或 productId
+
+3. **favorite-list** - 获取收藏列表
+   - 返回用户所有收藏的商品
+
+4. **follow-add/follow-remove/follow-list** - 关注相关
+
+5. **coupon-list** - 获取用户优惠券
+6. **coupon-claim** - 领取优惠券
+
+---
+
+## 四、数据库集合建议
+
+如需完善以上功能，建议新增以下集合：
+
+1. **favorites** - 收藏表
+   - _openid: 用户ID
+   - productId: 商品ID
+   - createTime: 收藏时间
+
+2. **follows** - 关注表
+   - _openid: 用户ID
+   - brandId: 品牌/店铺ID
+   - createTime: 关注时间
+
+3. **coupons** - 优惠券表（如果需要用户领取功能）
+   - _openid: 用户ID
+   - couponId: 优惠券ID
+   - status: 可用/已使用/已过期
+
+4. **addresses** - 地址表（已存在，可扩展）
+
+---
+
+## 五、实施建议
+
+### 第一阶段（1-2天）
+1. 完善收藏功能（前端+云函数+数据库）
+2. 完善"我的"页面导航
+
+### 第二阶段（2-3天）
+1. 优惠券页面
+2. 地址管理列表
+3. 设置页面
+
+### 第三阶段（可选）
+1. 关注功能
+2. 积分商城
+3. 其他高级功能
+
+---
+
+## 六、注意事项
+
+1. **小程序无需登录页面**：微信小程序天然登录，用户 openid 自动获取
+2. **JWT 不适用于小程序**：微信使用 openid/unionid 机制
+3. **CloudBase 已提供**：数据验证、错误响应、数据库操作能力
+4. **ORM 概念**：CloudBase NoSQL 使用文档模型，无需传统 ORM
+
+如需开发任何具体页面，请告知优先级！

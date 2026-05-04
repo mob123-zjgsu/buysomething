@@ -1,0 +1,8 @@
+# 敏感文件 - 不提交到 Git
+node_modules/
+.env
+*.log
+.DS_Store
+
+# 微信小程序编译产物
+/cloudfunctions/*/node_modules/

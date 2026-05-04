@@ -1,0 +1,332 @@
+# CloudBase 云函数 - 后端核心说明
+
+## 云函数目录
+`buysomething/cloudfunctions/`
+
+## 云函数列表
+
+| 云函数 | 作用 | 调用的数据库集合 |
+|--------|------|-----------------|
+| login | 用户登录验证 | users |
+| register | 用户注册 | users |
+| products | 获取商品列表 | products |
+| product-detail | 获取商品详情 | products |
+| delete-product | 删除商品 | products |
+| orders | 订单管理 | orders |
+| cart | 购物车管理 | cart |
+| sendSmsCode | 发送验证码 | - |
+| getOpenId | 获取用户OpenID | - |
+
+---
+
+## 1. login 云函数
+
+**文件**：`cloudfunctions/login/index.js`
+
+### 作用
+验证用户登录，返回用户信息
+
+### 输入参数
+```javascript
+{
+  phone: '13800138001',    // 手机号
+  password: '123456'      // 密码
+}
+```
+
+### 执行流程
+```
+1. 验证参数格式
+   ↓
+2. 查询 users 集合
+   db.collection('users').where({ phone: phone })
+   ↓
+3. 验证用户是否存在
+   ↓ 是 → 验证密码 ↓
+4. 返回 { success: true, userInfo: {...} }
+   ↓ 否
+5. 返回 { success: false, message: '用户不存在' }
+```
+
+### 返回示例
+```javascript
+{
+  success: true,
+  message: '登录成功',
+  userInfo: {
+    _id: '用户ID',
+    phone: '13800138001',
+    nickname: '用户8001',
+    avatar: '/images/default-avatar.png',
+    points: 0,
+    level: 1
+  }
+}
+```
+
+---
+
+## 2. register 云函数
+
+**文件**：`cloudfunctions/register/index.js`
+
+### 作用
+注册新用户，创建用户账号
+
+### 输入参数
+```javascript
+{
+  phone: '13800138001',    // 手机号
+  code: '123456',         // 验证码
+  password: '123456'      // 密码
+}
+```
+
+### 执行流程
+```
+1. 验证手机号格式 (/^1[3-9]\d{9}$/)
+   ↓ 不通过 → 返回错误
+2. 验证验证码 (必须为 123456)
+   ↓ 不通过 → 返回错误
+3. 验证密码长度 (6-20位)
+   ↓ 不通过 → 返回错误
+4. 检查手机号是否已注册
+   ↓ 已存在 → 返回错误
+5. 获取用户 OpenID (微信自动提供)
+   ↓
+6. 在 users 集合中创建新用户
+   ↓
+7. 返回用户信息
+```
+
+### 返回示例
+```javascript
+{
+  success: true,
+  message: '注册成功',
+  userInfo: {
+    _id: '新用户ID',
+    phone: '13800138001',
+    nickname: '用户8001',
+    avatar: '/images/default-avatar.png',
+    points: 0,
+    level: 1
+  }
+}
+```
+
+---
+
+## 3. products 云函数
+
+**文件**：`cloudfunctions/products/index.js`
+
+### 作用
+获取商品列表，支持分页
+
+### 输入参数
+```javascript
+{
+  page: 1,        // 页码（从1开始）
+  pageSize: 10,   // 每页数量
+  categoryId: ''  // 分类ID（可选）
+}
+```
+
+### 执行流程
+```
+1. 设置分页参数
+   ↓
+2. 构建查询条件
+   db.collection('products').where({ status: 1 })
+   ↓
+3. 执行分页查询
+   .skip((page-1) * pageSize)
+   .limit(pageSize)
+   ↓
+4. 获取总数
+   .count()
+   ↓
+5. 转换图片URL（过滤无效外部链接）
+   ↓
+6. 返回商品列表
+```
+
+### 返回示例
+```javascript
+{
+  code: 0,
+  message: 'success',
+  data: {
+    list: [
+      {
+        productId: '商品ID',
+        name: '夏季新款T恤',
+        price: 99,
+        originalPrice: 199,
+        image: '/images/product1.jpg',
+        sales: 1000,
+        rating: 4.8
+      },
+      // ...更多商品
+    ],
+    total: 12,      // 总商品数
+    page: 1,        // 当前页
+    pageSize: 10    // 每页数量
+  }
+}
+```
+
+---
+
+## 4. product-detail 云函数
+
+**文件**：`cloudfunctions/product-detail/index.js`
+
+### 作用
+获取单个商品的详细信息
+
+### 输入参数
+```javascript
+{
+  productId: 'd3a457a269dcef6d0423a88135e844c5'  // 商品ID
+}
+```
+
+### 执行流程
+```
+1. 获取商品ID
+   ↓
+2. 直接通过 ID 查询商品
+   db.collection('products').doc(productId).get()
+   ↓
+3. 检查商品是否存在
+   ↓ 不存在 → 返回 404
+4. 处理规格数据（colors/sizes）
+   ↓
+5. 转换图片URL
+   ↓
+6. 返回完整商品信息
+```
+
+### 返回示例
+```javascript
+{
+  code: 0,
+  message: 'success',
+  data: {
+    productId: '商品ID',
+    name: '夏季新款T恤',
+    price: 99,
+    originalPrice: 199,
+    image: '/images/product1.jpg',
+    images: ['/images/product1.jpg', '/images/product2.jpg'],
+    description: '轻薄透气面料，适合夏季穿着',
+    specs: {
+      colors: ['红色', '黑色', '白色', '蓝色'],
+      sizes: ['S', 'M', 'L', 'XL', 'XXL']
+    },
+    stock: 500,
+    sales: 1000,
+    rating: 4.8
+  }
+}
+```
+
+---
+
+## 5. delete-product 云函数
+
+**文件**：`cloudfunctions/delete-product/index.js`
+
+### 作用
+删除指定商品
+
+### 输入参数
+```javascript
+{
+  productId: '商品ID'  // 要删除的商品ID
+}
+```
+
+### 执行流程
+```
+1. 获取商品ID
+   ↓
+2. 从 products 集合中删除
+   db.collection('products').doc(productId).remove()
+   ↓
+3. 返回删除结果
+```
+
+### 返回示例
+```javascript
+{
+  code: 0,
+  message: '删除成功'
+}
+```
+
+---
+
+## 云函数通用架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     小程序前端                                 │
+│                                                              │
+│  wx.cloud.callFunction({                                    │
+│    name: '云函数名称',                                       │
+│    data: { /* 参数 */ }                                     │
+│  })                                                         │
+└─────────────────────────────────────────────────────────────┘
+                          ↓ 网络请求
+┌─────────────────────────────────────────────────────────────┐
+│                    CloudBase 云函数                          │
+│                                                              │
+│  wx-server-sdk                                              │
+│       ↓                                                      │
+│  cloud.init({ env: 'buysomething-...' })                  │
+│       ↓                                                      │
+│  const db = cloud.database()                                │
+│       ↓                                                      │
+│  db.collection('集合名').doc(id).get/add/update/remove()    │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│                   CloudBase 数据库                            │
+│                                                              │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐      │
+│  │  users   │ │ products │ │  orders  │ │   cart   │      │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 安全机制
+
+### OpenID 安全
+```
+每个云函数自动获取用户 OpenID：
+const { OPENID } = cloud.getWXContext()
+
+用户只能访问自己的数据：
+db.collection('users').where({ _openid: OPENID })
+```
+
+### 数据验证
+```
+所有云函数都进行参数验证：
+- 手机号格式
+- 密码长度
+- 必填参数检查
+```
+
+### 错误处理
+```
+统一的错误返回格式：
+{
+  code: 非0数字,
+  message: '错误描述',
+  data: null
+}
+```

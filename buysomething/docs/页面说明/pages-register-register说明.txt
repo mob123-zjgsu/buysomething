@@ -1,0 +1,172 @@
+# pages/register/register - 用户注册页面说明
+
+## 文件位置
+- JS: `buysomething/pages/register/register.js`
+- WXML: `buysomething/pages/register/register.wxml`
+- WXSS: `buysomething/pages/register/register.wxss`
+
+## 整体作用
+用户注册页面，支持手机号+验证码+密码的注册方式
+
+## JS 函数详解
+
+### 1. onLoad()
+```
+位置：register.js 第 1 行
+作用：页面加载时触发
+执行：
+  1. 设置导航栏标题
+  2. 初始化 data 中的表单数据
+```
+
+### 2. updateFormData()
+```
+位置：register.js 第 20-30 行
+作用：更新表单数据
+参数：
+  - e.detail.value  // 输入框的值
+  - e.currentTarget.dataset.field  // 字段名
+执行：动态设置 this.data.formData[fieldName]
+```
+
+### 3. sendCode()
+```
+位置：register.js 第 32-80 行
+作用：发送验证码
+前置条件：手机号格式正确
+执行流程：
+  1. 验证手机号格式（第 38-48 行）
+  2. 显示倒计时 UI
+  3. 调用云函数 sendSmsCode（第 55 行）
+  4. 启动 60 秒倒计时
+  5. 倒计时结束后恢复发送按钮
+```
+
+### 4. register()
+```
+位置：register.js 第 82-200 行
+作用：提交注册
+核心逻辑：
+  1. 验证所有表单字段（第 86-130 行）
+     - 手机号格式
+     - 验证码（必须是 123456）
+     - 密码长度（6-20位）
+     - 确认密码
+     - 用户协议勾选
+  2. 调用云函数 register（第 145 行）
+  3. 处理注册结果
+  4. 成功后调用 app.login() 保存登录状态
+  5. 跳转到首页
+
+### 调用云函数：register
+```javascript
+// register.js 第 145 行
+const res = await wx.cloud.callFunction({
+  name: 'register',      // 云函数名称
+  data: {
+    phone: this.data.formData.phone,    // 手机号
+    code: this.data.formData.code,      // 验证码
+    password: this.data.formData.password  // 密码
+  }
+})
+
+// 返回结构
+// res.result = { success: true, message: '注册成功', userInfo: {...} }
+```
+
+### 5. 验证函数
+```
+validatePhone()     - 验证手机号格式 /^1[3-9]\d{9}$/
+validateCode()      - 验证验证码（固定123456）
+validatePassword()  - 验证密码长度
+validateConfirm()   - 验证确认密码
+```
+
+### 6. goToLogin()
+```
+位置：register.js 第 230-235 行
+作用：已有账号，跳转到登录页
+实现：wx.navigateBack() 返回上一页
+```
+
+## 与后端交互
+
+```
+┌─────────────────────────────────────────────────────┐
+│              register.js                             │
+│                                                       │
+│  1. sendCode()                                       │
+│     wx.cloud.callFunction({                          │
+│       name: 'sendSmsCode',  ← 发送验证码云函数      │
+│       data: { phone: '138...' }                     │
+│     })                                               │
+│                                                       │
+│  2. register()                                       │
+│     wx.cloud.callFunction({                          │
+│       name: 'register',    ← 注册云函数             │
+│       data: { phone, code, password }              │
+│     })                                               │
+│                                                       │
+│     成功后：                                          │
+│     app.login(userInfo)  ← 保存登录状态             │
+└─────────────────────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────────────────────┐
+│              CloudBase 云函数                          │
+│                                                       │
+│  sendSmsCode 云函数：                                │
+│    - 接收手机号                                      │
+│    - 模拟发送验证码（实际使用腾讯云SMS）              │
+│    - 返回发送状态                                    │
+│                                                       │
+│  register 云函数：                                    │
+│    - 验证手机号格式                                  │
+│    - 验证验证码是否正确                              │
+│    - 检查手机号是否已注册                            │
+│    - 在 users 集合中创建新用户                       │
+│    - 返回用户信息                                   │
+└─────────────────────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────────────────────┐
+│              CloudBase 数据库                         │
+│                                                       │
+│  users 集合：                                        │
+│  {                                                   │
+│    _id: '自动生成',                                  │
+│    _openid: '微信用户唯一标识',                       │
+│    phone: '13800138001',                             │
+│    password: '加密后的密码',                          │
+│    nickname: '用户1380001',                          │
+│    avatar: '/images/default-avatar.png',             │
+│    points: 0,                                        │
+│    level: 1,                                         │
+│    createTime: Date                                  │
+│  }                                                   │
+└─────────────────────────────────────────────────────┘
+```
+
+## 表单数据结构
+
+```javascript
+// register.js data 中定义
+formData: {
+  phone: '',       // 手机号
+  code: '',       // 验证码
+  password: '',   // 密码
+  confirmPassword: '',  // 确认密码
+  agreed: false   // 是否同意协议
+}
+```
+
+## 错误处理
+
+| 错误情况 | 提示信息 |
+|---------|---------|
+| 手机号格式错误 | 请输入正确的手机号 |
+| 验证码为空 | 请输入验证码 |
+| 验证码错误 | 验证码错误，请输入 123456 |
+| 密码太短 | 密码长度应为6-20位 |
+| 密码不一致 | 两次密码不一致 |
+| 未勾选协议 | 请先阅读并同意用户协议 |
+| 注册失败 | 注册失败，请稍后重试 |
+| 手机号已注册 | 该手机号已注册 |

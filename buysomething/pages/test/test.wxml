@@ -1,0 +1,154 @@
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <text class="title">🧪 API 测试平台 v2.0</text>
+    <text class="subtitle">方案二：半自动化测试</text>
+  </view>
+
+  <!-- 测试类别选择 -->
+  <view class="category-bar">
+    <view class="category-tabs">
+      <view 
+        class="tab {{testCategory === 'all' ? 'active' : ''}}" 
+        data-category="all"
+        bindtap="switchCategory"
+      >全部</view>
+      <view 
+        class="tab {{testCategory === 'api' ? 'active' : ''}}" 
+        data-category="api"
+        bindtap="switchCategory"
+      >后端API (16)</view>
+      <view 
+        class="tab {{testCategory === 'frontend' ? 'active' : ''}}" 
+        data-category="frontend"
+        bindtap="switchCategory"
+      >前端组件 (9)</view>
+      <view 
+        class="tab {{testCategory === 'mock' ? 'active' : ''}}" 
+        data-category="mock"
+        bindtap="switchCategory"
+      >Mock测试 (4)</view>
+    </view>
+    
+    <button 
+      class="start-btn {{testing ? 'disabled' : ''}}" 
+      bindtap="startTests"
+      disabled="{{testing}}"
+    >
+      {{testing ? '测试中...' : '▶ 开始测试'}}
+    </button>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-bar">
+    <view class="stat-item">
+      <text class="stat-value">{{totalTests}}</text>
+      <text class="stat-label">总测试</text>
+    </view>
+    <view class="stat-item success">
+      <text class="stat-value">{{passedTests}}</text>
+      <text class="stat-label">通过</text>
+    </view>
+    <view class="stat-item error">
+      <text class="stat-value">{{failedTests}}</text>
+      <text class="stat-label">失败</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{passRate}}%</text>
+      <text class="stat-label">通过率</text>
+    </view>
+  </view>
+
+  <!-- 测试进度 -->
+  <view wx:if="{{testing}}" class="progress-bar">
+    <view class="progress-text">正在运行: {{currentTest}}</view>
+  </view>
+
+  <!-- 后端API测试结果 -->
+  <view wx:if="{{testCategory === 'all' || testCategory === 'api'}}" class="result-section">
+    <view class="section-header">
+      <text class="section-title">📡 后端API测试 (16个)</text>
+      <text class="section-count">{{apiResults.length}} / 16</text>
+    </view>
+    
+    <view wx:if="{{apiResults.length === 0}}" class="result-empty">
+      <text>点击"开始测试"运行后端API测试</text>
+    </view>
+    
+    <view wx:for="{{apiResults}}" wx:key="index" class="result-item">
+      <view class="result-header">
+        <text class="result-name">{{item.name}}</text>
+        <text class="result-status {{item.passed ? 'success' : 'error'}}">
+          {{item.passed ? '✅ PASS' : '❌ FAIL'}}
+        </text>
+      </view>
+      <text class="result-message">{{item.message}}</text>
+      <text class="result-time">{{item.time}} {{item.duration ? '|' + item.duration + 'ms' : ''}}</text>
+    </view>
+  </view>
+
+  <!-- 前端组件测试结果 -->
+  <view wx:if="{{testCategory === 'all' || testCategory === 'frontend'}}" class="result-section">
+    <view class="section-header">
+      <text class="section-title">🎨 前端组件测试 (9个)</text>
+      <text class="section-count">{{frontendResults.length}} / 9</text>
+    </view>
+    
+    <view wx:if="{{frontendResults.length === 0}}" class="result-empty">
+      <text>点击"开始测试"运行前端组件测试</text>
+    </view>
+    
+    <view wx:for="{{frontendResults}}" wx:key="index" class="result-item">
+      <view class="result-header">
+        <text class="result-name">{{item.name}}</text>
+        <text class="result-status {{item.passed ? 'success' : 'error'}}">
+          {{item.passed ? '✅ PASS' : '❌ FAIL'}}
+        </text>
+      </view>
+      <text class="result-message">{{item.message}}</text>
+    </view>
+  </view>
+
+  <!-- Mock API测试结果 -->
+  <view wx:if="{{testCategory === 'all' || testCategory === 'mock'}}" class="result-section">
+    <view class="section-header">
+      <text class="section-title">🔧 Mock API测试 (4个)</text>
+      <text class="section-count">{{mockResults.length}} / 4</text>
+    </view>
+    
+    <view wx:if="{{mockResults.length === 0}}" class="result-empty">
+      <text>点击"开始测试"运行Mock API测试</text>
+    </view>
+    
+    <view wx:for="{{mockResults}}" wx:key="index" class="result-item">
+      <view class="result-header">
+        <text class="result-name">{{item.name}}</text>
+        <text class="result-status {{item.passed ? 'success' : 'error'}}">
+          {{item.passed ? '✅ PASS' : '❌ FAIL'}}
+        </text>
+      </view>
+      <text class="result-message">{{item.message}}</text>
+    </view>
+  </view>
+
+  <!-- 日志区域 -->
+  <view class="log-section">
+    <view class="log-header">
+      <text class="section-title">📋 测试日志</text>
+      <button class="clear-btn" bindtap="clearLogs">清除</button>
+    </view>
+    <scroll-view scroll-y class="log-container">
+      <view wx:for="{{logs}}" wx:key="index" class="log-item {{item.type}}">
+        <text>{{item.text}}</text>
+      </view>
+      <view wx:if="{{logs.length === 0}}" class="log-empty">
+        <text>暂无日志</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 导出报告按钮 -->
+  <button class="export-btn" bindtap="exportReport" wx:if="{{totalTests > 0}}">
+    📤 导出测试报告
+  </button>
+</view>

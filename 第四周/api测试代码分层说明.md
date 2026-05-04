@@ -1,0 +1,267 @@
+# api测试代码分层说明
+
+## 项目架构
+
+```
+buysomething/
+├── cloudfunctions/          # 后端 API（云函数）
+│   ├── login/               # 登录 API
+│   ├── products/            # 商品列表 API
+│   ├── product-detail/      # 商品详情 API
+│   ├── cart/               # 购物车 API
+│   └── orders/             # 订单 API
+│
+└── pages/                  # 前端页面
+    ├── home/               # 首页（商品列表）
+    ├── product-detail/     # 商品详情页
+    ├── cart/              # 购物车页
+    ├── orders/            # 订单页
+    ├── login/             # 登录页
+    ├── register/          # 注册页
+    ├── profile/           # 个人中心
+    └── test/              # API 测试页
+```
+
+---
+
+## 前端 API 访问层代码
+
+前端使用 `wx.cloud.callFunction` 调用云函数。
+
+### 1. 测试页面（完整示例）
+
+**文件**: `pages/test/test.js`
+
+```javascript
+// 测试1: 用户登录
+const loginRes = await wx.cloud.callFunction({
+  name: 'login',
+  data: {
+    phone: '13800138001',
+    password: '123456',
+    code: '0000'
+  }
+})
+
+// 测试2: 获取商品列表
+const productsRes = await wx.cloud.callFunction({
+  name: 'products',
+  data: { page: 1, pageSize: 10 }
+})
+
+// 测试3: 获取商品详情
+const detailRes = await wx.cloud.callFunction({
+  name: 'product-detail',
+  data: { productId: 'xxx' }
+})
+
+// 测试4: 添加购物车
+const cartRes = await wx.cloud.callFunction({
+  name: 'cart',
+  data: {
+    action: 'add',
+    userId: 'user-xxx',
+    productId: 'product-xxx',
+    quantity: 2
+  }
+})
+
+// 测试5: 创建订单
+const orderRes = await wx.cloud.callFunction({
+  name: 'orders',
+  data: {
+    action: 'create',
+    userId: 'user-xxx',
+    addressId: 'addr-xxx',
+    items: [{ productId: 'product-xxx', quantity: 2 }]
+  }
+})
+```
+
+### 2. 首页商品列表
+
+**文件**: `pages/home/home.js`
+
+```javascript
+// 获取商品列表
+loadMoreProducts() {
+  wx.cloud.callFunction({
+    name: 'products',
+    data: {
+      page: this.data.page,
+      pageSize: 20
+    }
+  }).then(res => {
+    // 处理结果
+  })
+}
+
+// 测试代码（onLoad 中）
+this.testCloudFunctions()
+```
+
+### 3. 其他页面调用示例
+
+```javascript
+// 登录页调用 login
+wx.cloud.callFunction({
+  name: 'login',
+  data: { phone, password }
+})
+
+// 购物车页调用 cart
+wx.cloud.callFunction({
+  name: 'cart',
+  data: { action: 'list', userId }
+})
+
+// 订单页调用 orders
+wx.cloud.callFunction({
+  name: 'orders',
+  data: { action: 'list', userId }
+})
+```
+
+---
+
+## 后端 API 实现代码
+
+后端使用云函数，接收小程序调用，返回数据。
+
+### 1. 登录 API
+
+**文件**: `cloudfunctions/login/index.js`
+
+```javascript
+const cloud = require('wx-server-sdk')
+const crypto = require('crypto')
+
+cloud.init({ env: 'buysomething-6gbmbtpxff05be35' })
+const db = cloud.database()
+
+// MD5 加密
+function md5(str) {
+  return crypto.createHash('md5').update(str).digest('hex');
+}
+
+exports.main = async (event, context) => {
+  const { phone, password, code } = event
+
+  // 参数验证
+  if (!phone || !password) {
+    return { code: 1001, message: '手机号和密码不能为空' }
+  }
+
+  // 查询用户
+  const userResult = await db.collection('users').where({ phone }).get()
+
+  // 验证密码（MD5 比对）
+  const inputPasswordMd5 = md5(password)
+  if (user.password !== inputPasswordMd5) {
+    return { code: 1002, message: '密码错误' }
+  }
+
+  // 返回结果
+  return {
+    code: 0,
+    message: 'success',
+    data: { token: 'xxx', userInfo: {...} }
+  }
+}
+```
+
+### 2. 商品列表 API
+
+**文件**: `cloudfunctions/products/index.js`
+
+```javascript
+exports.main = async (event, context) => {
+  const { page = 1, pageSize = 20 } = event
+
+  // 查询数据库
+  const result = await db.collection('products')
+    .where({ status: 1 })
+    .skip((page - 1) * pageSize)
+    .limit(pageSize)
+    .get()
+
+  // 返回数据
+  return {
+    code: 0,
+    message: 'success',
+    data: { list: result.data, total: result.data.length }
+  }
+}
+```
+
+### 3. 购物车 API
+
+**文件**: `cloudfunctions/cart/index.js`
+
+```javascript
+exports.main = async (event, context) => {
+  const { action, userId, productId } = event
+
+  if (action === 'list') {
+    // 获取购物车列表
+    const cartResult = await db.collection('cart').where({ userId }).get()
+    return { code: 0, data: { list: cartResult.data } }
+  }
+
+  if (action === 'add') {
+    // 添加商品到购物车
+    await db.collection('cart').add({
+      data: { userId, productId, quantity: 1 }
+    })
+    return { code: 0, message: 'success' }
+  }
+}
+```
+
+### 4. 订单 API
+
+**文件**: `cloudfunctions/orders/index.js`
+
+```javascript
+exports.main = async (event, context) => {
+  const { action, userId, items } = event
+
+  if (action === 'create') {
+    // 计算订单金额
+    // 创建订单记录
+    const orderResult = await db.collection('orders').add({
+      data: { userId, items, status: 0, totalAmount: xxx }
+    })
+    return { code: 0, data: { orderId: orderResult._id } }
+  }
+}
+```
+
+---
+
+## 前后端数据流
+
+```
+┌─────────────────┐         wx.cloud.callFunction         ┌─────────────────┐
+│   小程序前端    │  ──────────────────────────────────→  │   云函数后端    │
+│                 │                                       │                 │
+│ pages/test/    │  data: { phone, password }            │ login/index.js  │
+│   test.js      │  ──────────────────────────────────→  │   验证密码      │
+│                 │                                       │   查询数据库    │
+│                 │  ←──────────────────────────────────  │   返回结果      │
+│                 │  { code: 0, data: {...} }            │                 │
+└─────────────────┘                                       └─────────────────┘
+```
+
+---
+
+## 代码对照表
+
+| 功能 | 前端代码 | 后端代码 |
+|------|----------|----------|
+| 登录 | `pages/login/login.js` | `cloudfunctions/login/index.js` |
+| 商品列表 | `pages/home/home.js` | `cloudfunctions/products/index.js` |
+| 商品详情 | `pages/product-detail/product-detail.js` | `cloudfunctions/product-detail/index.js` |
+| 购物车 | `pages/cart/cart.js` | `cloudfunctions/cart/index.js` |
+| 订单 | `pages/order-list/order-list.js` | `cloudfunctions/orders/index.js` |
+| 测试 | `pages/test/test.js` | - |

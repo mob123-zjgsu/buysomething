@@ -1,0 +1,154 @@
+# pages/home/home - 首页说明
+
+## 文件位置
+- JS: `buysomething/pages/home/home.js`
+- WXML: `buysomething/pages/home/home.wxml`
+- WXSS: `buysomething/pages/home/home.wxss`
+
+## 整体作用
+展示首页内容，包括 Banner 轮播图、商品分类、推荐商品列表
+
+## JS 函数详解
+
+### 1. onLoad(options)
+```
+位置：home.js 第 1 行
+作用：页面加载时触发
+参数：options - 页面参数（如果有）
+执行：
+  1. 调用 loadBanners() 加载轮播图
+  2. 调用 loadCategories() 加载分类
+  3. 调用 loadProducts() 加载商品
+```
+
+### 2. loadBanners()
+```
+位置：home.js 第 20-50 行
+作用：加载首页轮播图
+数据来源：本地静态数据（模拟）
+返回值格式：
+{
+  id: 1,
+  image: '/images/banner1.jpg',
+  link: '/pages/product-detail/...'
+}
+使用位置：wxml 第 5-15 行，swiper 组件展示
+```
+
+### 3. loadCategories()
+```
+位置：home.js 第 52-80 行
+作用：加载商品分类图标
+数据来源：本地静态数据（模拟）
+返回值格式：
+{
+  id: 'cat-001',
+  name: '手机数码',
+  icon: '📱'
+}
+使用位置：wxml 第 17-30 行，横向滚动展示
+```
+
+### 4. loadProducts()
+```
+位置：home.js 第 82-130 行
+作用：加载推荐商品列表
+调用云函数：products (第 94 行)
+参数：
+  - page: 1  // 页码
+  - pageSize: 10  // 每页数量
+返回数据：商品数组
+处理逻辑：
+  1. 调用 wx.cloud.callFunction() 请求云函数
+  2. 从结果中提取 product.list
+  3. 转换图片 URL，过滤无效链接
+  4. 保存到 products 数组
+  5. 调用 setData() 更新视图
+```
+
+### 5. goToCategory(e)
+```
+位置：home.js 第 132-145 行
+作用：点击分类图标，跳转到分类页
+参数：e.currentTarget.dataset.id  // 分类ID
+实现：wx.switchTab 切换到分类 tab 页
+```
+
+### 6. goToProductDetail(e)
+```
+位置：home.js 第 147-160 行
+作用：点击商品卡片，跳转到商品详情页
+参数：e.currentTarget.dataset.id  // 商品ID
+实现：wx.navigateTo 跳转到详情页
+URL 格式：/pages/product-detail/product-detail?id=商品ID
+```
+
+### 7. goToSearch()
+```
+位置：home.js 第 162-170 行
+作用：点击搜索图标，跳转到搜索页
+实现：wx.navigateTo 跳转
+URL：/pages/product-list/product-list
+```
+
+### 8. onReachBottom()
+```
+位置：home.js 第 172-190 行
+作用：页面滚动到底部时触发（上拉加载更多）
+执行：
+  1. 如果还有更多商品
+  2. page++  页码加1
+  3. 调用云函数加载下一页
+  4. 合并到 products 数组
+```
+
+## 数据流向图
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    home.js                           │
+│                                                       │
+│  onLoad()                                             │
+│    ├── loadBanners() → 本地数据 → banners[]          │
+│    ├── loadCategories() → 本地数据 → categories[]    │
+│    └── loadProducts()                                │
+│              ↓                                        │
+│    wx.cloud.callFunction({                           │
+│      name: 'products',   ←─── 调用云函数              │
+│      data: { page, pageSize }                       │
+│    })                                                 │
+│              ↓                                        │
+│    ┌─────────────────────────────────────────┐       │
+│    │           CloudBase 云函数                │       │
+│    │  name: 'products'                        │       │
+│    │  作用: 查询 products 集合，返回商品列表     │       │
+│    └─────────────────────────────────────────┘       │
+│              ↓                                        │
+│    处理返回数据，更新 products[]                       │
+└─────────────────────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────────────────────┐
+│                    home.wxml                          │
+│                                                       │
+│  {{banners}} → <swiper> 轮播图                      │
+│  {{categories}} → <scroll-view> 分类图标             │
+│  {{products}} → <product-card> 商品卡片              │
+└─────────────────────────────────────────────────────┘
+```
+
+## 与后端交互
+
+### 调用云函数：products
+```javascript
+// home.js 第 94 行
+const res = await wx.cloud.callFunction({
+  name: 'products',      // 云函数名称
+  data: {
+    page: this.data.page,     // 当前页码
+    pageSize: 10             // 每页数量
+  }
+})
+
+// 返回结构
+// res.result = { code: 0, message: 'success', data: { list: [...], total: 12 } }
+```

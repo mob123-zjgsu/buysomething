@@ -1,0 +1,72 @@
+<view class="home-container">
+  <!-- 顶部导航栏 -->
+  <view class="navbar">
+    <view class="location" bindtap="chooseLocation">
+      <text class="location-icon">📍</text>
+      <text class="location-text">{{location || '上海·南京路'}}</text>
+      <text class="arrow">›</text>
+    </view>
+    <view class="search-box" bindtap="goToSearch">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索商品...</text>
+    </view>
+    <view class="message-icon" bindtap="goToMessage">
+      <text>💬</text>
+      <view class="badge" wx:if="{{messageCount > 0}}">{{messageCount}}</view>
+    </view>
+  </view>
+
+  <!-- 轮播图 Banner -->
+  <view class="banner-container">
+    <swiper class="banner-swiper" indicator-dots autoplay circular interval="3000">
+      <swiper-item wx:for="{{banners}}" wx:key="id">
+        <image class="banner-image" src="{{item.image}}" mode="aspectFill"></image>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 功能图标区 -->
+  <view class="function-icons">
+    <scroll-view scroll-x class="function-scroll">
+      <view class="function-item" wx:for="{{functions}}" wx:key="id" bindtap="handleFunctionClick" data-type="{{item.type}}">
+        <view class="function-icon" style="background: {{item.bgColor}}">
+          <text>{{item.icon}}</text>
+        </view>
+        <text class="function-name">{{item.name}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 热门推荐 -->
+  <view class="recommend-section">
+    <view class="section-header">
+      <text class="section-title">热门推荐</text>
+      <view class="more-btn" bindtap="viewMore">
+        <text class="more-text">查看更多</text>
+        <text class="more-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 商品瀑布流 -->
+    <view class="product-waterfall">
+      <view class="product-card" wx:for="{{products}}" wx:key="productId" bindtap="goToProductDetail" data-id="{{item.productId}}">
+        <image class="product-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="product-info">
+          <text class="product-name">{{item.name}}</text>
+          <view class="product-price-row">
+            <text class="product-price">¥{{item.price}}</text>
+            <text class="product-original-price" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+          </view>
+          <view class="product-sales">
+            <text>月销 {{item.sales}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore}}">
+      <text>加载中...</text>
+    </view>
+  </view>
+</view>

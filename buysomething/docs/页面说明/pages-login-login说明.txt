@@ -1,0 +1,156 @@
+# pages/login/login - 用户登录页面说明
+
+## 文件位置
+- JS: `buysomething/pages/login/login.js`
+- WXML: `buysomething/pages/login/login.wxml`
+- WXSS: `buysomething/pages/login/login.wxss`
+
+## 整体作用
+用户登录页面，支持手机号+密码登录，以及一键登录功能
+
+## JS 函数详解
+
+### 1. onLoad(options)
+```
+位置：login.js 第 1 行
+作用：页面加载时触发
+参数：options.redirect - 登录后重定向的页面路径
+```
+
+### 2. updateFormData()
+```
+位置：login.js 第 20-30 行
+作用：更新表单数据（手机号/密码）
+参数：fieldName - 字段名, value - 值
+```
+
+### 3. passwordLogin()
+```
+位置：login.js 第 35-130 行
+作用：手机号+密码登录（主要登录方式）
+执行流程：
+  1. 验证手机号格式（第 40-50 行）
+  2. 验证密码不为空（第 55-60 行）
+  3. 调用云函数 login（第 80 行）
+  4. 登录成功处理：
+     - 保存用户信息到 app.globalData
+     - 调用 app.login() 保存状态
+     - 跳转到首页或指定页面
+  5. 登录失败处理：
+     - 显示错误信息
+     - 提示用户检查账号密码
+```
+
+### 4. wechatLogin()
+```
+位置：login.js 第 135-180 行
+作用：微信一键登录
+执行流程：
+  1. 显示 loading 提示
+  2. 获取微信登录凭证 code（第 145 行）
+  3. 调用云函数 wxLogin 验证（第 165 行）
+  4. 成功后处理同 passwordLogin
+```
+
+### 5. getPhoneNumber(e)
+```
+位置：login.js 第 185-220 行
+作用：获取用户手机号（需要用户点击授权）
+参数：e.detail - 包含加密手机号
+执行流程：
+  1. 检查用户是否授权
+  2. 解密获取手机号
+  3. 自动登录
+```
+
+### 6. sendCode() / 验证码登录
+```
+位置：login.js 第 240-300 行
+作用：发送验证码进行登录
+流程：同注册页的 sendCode
+```
+
+## 与后端交互
+
+### 调用云函数：login
+```javascript
+// login.js 第 80 行
+const res = await wx.cloud.callFunction({
+  name: 'login',           // 云函数名称
+  data: {
+    phone: this.data.phone,      // 手机号
+    password: this.data.password  // 密码
+  }
+})
+
+// 返回结构
+// res.result = { 
+//   success: true, 
+//   message: '登录成功', 
+//   userInfo: {
+//     _id: '用户ID',
+//     phone: '手机号',
+//     nickname: '昵称',
+//     avatar: '头像URL',
+//     points: 100,
+//     level: 1
+//   }
+// }
+```
+
+## 登录流程图
+
+```
+┌────────────────────────────────────────────────────────┐
+│                    login.js                              │
+│                                                          │
+│  passwordLogin() 或 wechatLogin()                        │
+│         ↓                                                │
+│  wx.cloud.callFunction({                                 │
+│    name: 'login',     ←─── 调用登录云函数               │
+│    data: { phone, password }                          │
+│  })                                                     │
+│         ↓                                                │
+│  ┌──────────────────────────────────────────┐          │
+│  │          CloudBase login 云函数             │          │
+│  │                                           │          │
+│  │  1. 查询 users 集合                       │          │
+│  │  2. 验证手机号是否存在                     │          │
+│  │  3. 验证密码是否正确                       │          │
+│  │  4. 返回用户信息                           │          │
+│  └──────────────────────────────────────────┘          │
+│         ↓                                                │
+│  登录成功                                               │
+│         ↓                                                │
+│  app.login(userInfo)  ←─── 保存登录状态                │
+│         ↓                                                │
+│  wx.switchTab({ url: '/pages/home/home' })           │
+└────────────────────────────────────────────────────────┘
+```
+
+## 三种登录方式对比
+
+| 方式 | 函数 | 适用场景 |
+|------|------|---------|
+| 手机号+密码 | passwordLogin() | 已有账号登录 |
+| 微信一键登录 | wechatLogin() | 新用户快速登录 |
+| 验证码登录 | sendCode() | 忘记密码时使用 |
+
+## 登录状态保存
+
+```javascript
+// 登录成功后
+const app = getApp()
+app.globalData.isLogin = true
+app.globalData.userInfo = userInfo
+
+// 保存到本地存储
+wx.setStorageSync('userInfo', userInfo)
+wx.setStorageSync('isLogin', true)
+
+// 后续页面通过以下方式判断登录状态
+const app = getApp()
+if (app.globalData.isLogin) {
+  // 已登录，执行操作
+}
+```

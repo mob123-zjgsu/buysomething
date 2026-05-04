@@ -1,0 +1,404 @@
+.product-detail-container {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+  padding-bottom: 180rpx;  /* 为底部操作栏留出空间 */
+}
+
+/* 安全区域适配 - iPhone X 及以上 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .product-detail-container {
+    padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+  }
+  
+  .bottom-bar {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 10rpx);
+  }
+}
+
+/* 商品轮播 */
+.product-swiper {
+  width: 100%;
+  height: 700rpx;
+  background-color: #FFFFFF;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 商品信息 */
+.product-info {
+  background-color: #FFFFFF;
+  padding: 32rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.price-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.current-price {
+  font-size: 56rpx;
+  font-weight: bold;
+  color: #FF6B6B;
+  margin-right: 16rpx;
+}
+
+.original-price {
+  font-size: 32rpx;
+  color: #999999;
+  text-decoration: line-through;
+  margin-right: 16rpx;
+}
+
+.discount-tag {
+  padding: 8rpx 16rpx;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  border-radius: 8rpx;
+}
+
+.product-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 12rpx;
+  line-height: 1.4;
+}
+
+.product-subtitle {
+  font-size: 28rpx;
+  color: #999999;
+  margin-bottom: 20rpx;
+}
+
+.product-stats {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.sales {
+  flex: 1;
+}
+
+.rating {
+  color: #FFB347;
+}
+
+/* 规格选择 */
+.spec-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #FFFFFF;
+  padding: 32rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.spec-label {
+  font-size: 28rpx;
+  color: #666666;
+  width: 160rpx;
+}
+
+.spec-values {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.arrow {
+  margin-left: 16rpx;
+  color: #999999;
+  font-size: 32rpx;
+}
+
+/* 商品详情 */
+.detail-section {
+  background-color: #FFFFFF;
+  padding: 32rpx 24rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.detail-content {
+  line-height: 0;
+}
+
+.detail-image {
+  width: 100%;
+  display: block;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  padding: 16rpx 20rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.left-actions {
+  display: flex;
+  gap: 40rpx;
+  padding-right: 24rpx;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64rpx;
+}
+
+.action-icon {
+  font-size: 40rpx;
+  margin-bottom: 4rpx;
+}
+
+.action-text {
+  font-size: 20rpx;
+  color: #666666;
+}
+
+.right-actions {
+  display: flex;
+  gap: 16rpx;
+  flex: 1;
+}
+
+.btn-add-cart, .btn-buy-now {
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  border: none;
+  padding: 0 24rpx;
+  margin: 0;
+  flex: 1;
+  max-width: 240rpx;
+}
+
+.btn-add-cart {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  color: #FFFFFF;
+}
+
+.btn-buy-now {
+  background: linear-gradient(135deg, #4ECDC4 0%, #6EE7DE 100%);
+  color: #FFFFFF;
+}
+
+/* 规格选择弹窗 */
+.spec-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.spec-modal.show {
+  pointer-events: auto;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.spec-modal.show .modal-mask {
+  opacity: 1;
+}
+
+.modal-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-height: 80vh;
+  background-color: #FFFFFF;
+  border-radius: 24rpx 24rpx 0 0;
+  transform: translateY(100%);
+  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-modal.show .modal-content {
+  transform: translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  padding: 32rpx 24rpx;
+  border-bottom: 1rpx solid #EEEEEE;
+}
+
+.spec-preview {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+}
+
+.spec-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.spec-price {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #FF6B6B;
+  margin-bottom: 12rpx;
+}
+
+.spec-selected {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.spec-stock {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+.spec-stock.no-stock {
+  color: #FF6B6B;
+}
+
+.no-spec-tip {
+  text-align: center;
+  padding: 40rpx 0;
+  color: #999999;
+  font-size: 28rpx;
+}
+
+.modal-body {
+  flex: 1;
+  padding: 32rpx 24rpx;
+  overflow-y: auto;
+}
+
+.spec-group {
+  margin-bottom: 40rpx;
+}
+
+.spec-group-title {
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 20rpx;
+}
+
+.spec-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.spec-option {
+  min-width: 120rpx;
+  padding: 20rpx 32rpx;
+  background-color: #F5F5F5;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  color: #333333;
+  border: 2rpx solid transparent;
+  text-align: center;
+  margin: 8rpx;
+}
+
+.spec-option.active {
+  background-color: #FFF0F0;
+  color: #FF6B6B;
+  border-color: #FF6B6B;
+}
+
+/* 数量选择 */
+.quantity-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20rpx;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.quantity-btn {
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  background-color: #F5F5F5;
+  border: none;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  color: #333333;
+  padding: 0;
+}
+
+.quantity-input {
+  width: 100rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  background-color: #F5F5F5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.modal-footer {
+  padding: 24rpx;
+  border-top: 1rpx solid #EEEEEE;
+}
+
+.btn-confirm {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  color: #FFFFFF;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  border: none;
+}

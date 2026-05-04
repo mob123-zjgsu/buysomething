@@ -1,0 +1,118 @@
+# app.js - 小程序入口文件说明
+
+## 文件位置
+`buysomething/app.js`
+
+## 整体作用
+小程序启动时首先执行的入口文件，负责：
+1. 初始化 CloudBase 云开发环境
+2. 检查用户登录状态
+3. 管理全局数据
+
+## 核心函数详解
+
+### 1. onLaunch(options)
+```
+位置：第 2 行
+作用：小程序初始化时自动调用（生命周期函数）
+参数：options - 启动参数（场景值、来源等）
+
+代码流程：
+1. 打印启动日志
+2. 调用 wx.cloud.init() 初始化云开发环境
+3. 调用 checkLoginStatus() 检查登录状态
+```
+
+### 2. wx.cloud.init()
+```
+位置：第 7-11 行
+作用：初始化 CloudBase 云开发环境
+参数：
+  - env: 'buysomething-6gbmbtpxff05be35'  // 云开发环境ID
+  - traceUser: true  // 记录用户访问
+说明：此配置使小程序能够使用云函数和云数据库
+```
+
+### 3. checkLoginStatus()
+```
+位置：第 28-41 行
+作用：检查用户是否已登录
+逻辑：
+  1. 从本地存储读取 userInfo 和 isLogin
+  2. 如果存在，设置 globalData.isLogin = true
+  3. 否则设置为 false
+
+涉及的存储键：
+  - wx.getStorageSync('userInfo')  // 用户信息
+  - wx.getStorageSync('isLogin')  // 登录状态
+```
+
+### 4. login(userInfo)
+```
+位置：第 44-49 行
+作用：保存登录状态
+参数：userInfo - 用户信息对象
+执行：
+  1. 设置 globalData.isLogin = true
+  2. 保存到 globalData.userInfo
+  3. 同步保存到本地存储
+```
+
+### 5. logout()
+```
+位置：第 52-57 行
+作用：清除登录状态（退出登录）
+执行：
+  1. 设置 globalData.isLogin = false
+  2. 清空 globalData.userInfo
+  3. 清除本地存储中的用户信息
+```
+
+### 6. getDB()
+```
+位置：第 60-65 行
+作用：获取云数据库实例
+返回值：wx.cloud.database() 数据库对象
+说明：供其他页面调用，操作云数据库
+```
+
+## globalData 全局数据
+```
+位置：第 67-73 行
+包含：
+  - isLogin: false  // 登录状态
+  - userInfo: null  // 用户信息
+  - cartCount: 0   // 购物车商品数量
+  - primaryColor: '#FF6B6B'  // 主题色（红色）
+  - secondaryColor: '#4ECDC4'  // 辅助色（青色）
+```
+
+## 与后端 CloudBase 的连接
+
+```
+┌─────────────────────────────────────────────────┐
+│                    app.js                        │
+│                                                  │
+│  wx.cloud.init({ env: 'buysomething-...' })     │
+│         ↓                                        │
+│  初始化 CloudBase 连接                            │
+└─────────────────────────────────────────────────┘
+         ↓
+┌─────────────────────────────────────────────────┐
+│              CloudBase 云端                       │
+│  ┌─────────┐  ┌──────────┐  ┌─────────────┐    │
+│  │ 云函数   │  │ 云数据库   │  │ 云存储      │    │
+│  │ login   │  │ users    │  │ images      │    │
+│  │ register│  │ products │  │             │    │
+│  │ products│  │ orders   │  │             │    │
+│  └─────────┘  └──────────┘  └─────────────┘    │
+└─────────────────────────────────────────────────┘
+```
+
+## 数据流向
+1. 用户打开小程序 → app.js 执行 onLaunch
+2. 调用 wx.cloud.init() 连接 CloudBase
+3. checkLoginStatus() 读取本地存储判断登录状态
+4. 其他页面通过 getApp() 获取 globalData
+5. 通过 wx.cloud.callFunction() 调用云函数
+6. 通过 wx.cloud.database() 操作云数据库

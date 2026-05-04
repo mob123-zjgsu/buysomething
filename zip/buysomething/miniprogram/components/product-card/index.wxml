@@ -1,0 +1,38 @@
+<view class="product-card" bindtap="onTap">
+  <!-- 商品图片 -->
+  <view class="image-wrapper">
+    <image 
+      class="product-image" 
+      src="{{product.image || '/images/product1.jpg'}}" 
+      mode="aspectFill"
+      lazy-load
+    />
+    <!-- 折扣标签 -->
+    <view class="discount-tag" wx:if="{{showDiscount && product.discount}}">
+      {{product.discount}}
+    </view>
+  </view>
+
+  <!-- 商品信息 -->
+  <view class="product-info">
+    <!-- 商品名称 -->
+    <view class="product-name">{{product.name}}</view>
+    
+    <!-- 价格区域 -->
+    <view class="price-row">
+      <text class="current-price">¥{{product.price}}</text>
+      <text class="original-price" wx:if="{{showOriginalPrice && product.originalPrice}}">
+        ¥{{product.originalPrice}}
+      </text>
+    </view>
+
+    <!-- 销量和操作 -->
+    <view class="bottom-row">
+      <text class="sales" wx:if="{{showSales}}">已售{{product.sales || 0}}</text>
+      <view class="actions">
+        <text class="action-icon favorite-icon" bindtap="onFavorite">🤍</text>
+        <text class="action-icon cart-icon" bindtap="onAddCart">🛒</text>
+      </view>
+    </view>
+  </view>
+</view>

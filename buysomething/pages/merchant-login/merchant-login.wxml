@@ -1,0 +1,49 @@
+<!-- 商家登录页面 -->
+<view class="merchant-login">
+  <!-- 返回按钮 -->
+  <view class="back-btn" bindtap="goBack">
+    <text>‹</text>
+  </view>
+
+  <!-- Logo区域 -->
+  <view class="logo-section">
+    <text class="logo-icon">🏪</text>
+    <text class="welcome-title">商家登录</text>
+    <text class="welcome-subtitle">管理您的店铺和商品</text>
+  </view>
+
+  <!-- 登录表单 -->
+  <view class="login-form">
+    <view class="input-group">
+      <view class="input-wrapper">
+        <text class="input-icon">📱</text>
+        <input class="input-field" type="number" placeholder="请输入手机号" maxlength="11" bindinput="onPhoneInput" value="{{phone}}" />
+      </view>
+    </view>
+
+    <view class="input-group">
+      <view class="input-wrapper">
+        <text class="input-icon">🔒</text>
+        <input class="input-field" type="{{showPassword ? 'text' : 'password'}}" placeholder="请输入密码" bindinput="onPasswordInput" value="{{password}}" />
+        <text class="eye-icon" bindtap="togglePassword">
+          {{showPassword ? '👁️' : '👁️‍🗨️'}}
+        </text>
+      </view>
+    </view>
+
+    <button class="btn-login {{!canLogin ? 'disabled' : ''}}" disabled="{{!canLogin}}" bindtap="doLogin">
+      登录
+    </button>
+
+    <!-- 注册入口 -->
+    <view class="register-section">
+      <text class="register-text">还没有商家账号?</text>
+      <text class="register-link" bindtap="goToRegister">商家注册</text>
+    </view>
+  </view>
+
+  <!-- 切换到用户登录 -->
+  <view class="switch-section">
+    <text class="switch-text" bindtap="switchToUser">我是普通用户</text>
+  </view>
+</view>

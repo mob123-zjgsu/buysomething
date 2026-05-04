@@ -1,0 +1,264 @@
+.order-detail-container {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+  padding-bottom: 120rpx;
+}
+
+/* 订单状态 */
+.order-status-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+  background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+}
+
+.status-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.status-text {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 8rpx;
+}
+
+.status-tip {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 地址信息 */
+.address-section {
+  display: flex;
+  align-items: flex-start;
+  padding: 32rpx 24rpx;
+  background-color: #FFFFFF;
+  margin-bottom: 16rpx;
+}
+
+.address-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.address-info {
+  flex: 1;
+}
+
+.address-name-phone {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.address-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333333;
+  margin-right: 20rpx;
+}
+
+.address-phone {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.address-detail {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.5;
+}
+
+/* 商品列表 */
+.products-section {
+  background-color: #FFFFFF;
+  padding: 32rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 24rpx;
+}
+
+.product-item {
+  display: flex;
+  margin-bottom: 24rpx;
+}
+
+.product-item:last-child {
+  margin-bottom: 0;
+}
+
+.product-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-name {
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-spec {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 16rpx;
+}
+
+.product-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product-price {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #FF6B6B;
+}
+
+.product-quantity {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* 订单信息 */
+.order-info-section {
+  background-color: #FFFFFF;
+  padding: 32rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  width: 160rpx;
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.info-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.copy-btn {
+  padding: 8rpx 16rpx;
+  background-color: #F5F5F5;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: #FF6B6B;
+}
+
+/* 价格明细 */
+.price-section {
+  background-color: #FFFFFF;
+  padding: 32rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.price-row:last-child {
+  margin-bottom: 0;
+}
+
+.price-label {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.price-value {
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.price-row.discount .price-value {
+  color: #4CAF50;
+}
+
+.price-row.total {
+  padding-top: 24rpx;
+  border-top: 1rpx solid #F5F5F5;
+}
+
+.price-row.total .price-label {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333333;
+}
+
+.price-row.total .price-value {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FF6B6B;
+}
+
+/* 底部操作栏 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16rpx 24rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.08);
+  gap: 16rpx;
+}
+
+.btn-action {
+  min-width: 160rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  padding: 0 24rpx;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.btn-secondary {
+  background-color: #F5F5F5;
+  color: #666666;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  color: #FFFFFF;
+}
