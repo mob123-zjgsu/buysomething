@@ -1,10 +1,24 @@
 const cloud = require('wx-server-sdk');
+const crypto = require('crypto');
 
 cloud.init({
   env: 'buysomething-6gbmbtpxff05be35'
 });
 
 const db = cloud.database();
+
+// 简单的密码哈希函数
+function md5(str) {
+  return crypto.createHash('md5').update(str).digest('hex');
+}
+
+function hashPassword(password, salt) {
+  let hash = password + salt;
+  for (let i = 0; i < 1000; i++) {
+    hash = md5(hash);
+  }
+  return hash;
+}
 
 exports.main = async (event, context) => {
   const { phone, password, merchantName, mainProducts, contactPerson } = event;
@@ -51,14 +65,19 @@ exports.main = async (event, context) => {
       };
     }
 
+    // 生成密码盐值并哈希
+    const salt = md5(phone + Date.now().toString());
+    const hashedPassword = hashPassword(password, salt);
+
     // 创建商家记录（待审核状态）
     const merchantData = {
       phone: phone,
-      password: password, // 实际应该加密存储
+      password: hashedPassword,
+      passwordSalt: salt,
       merchantName: merchantName,
       mainProducts: mainProducts,
       contactPerson: contactPerson || '',
-      status: 'pending', // pending=待审核, approved=审核通过, rejected=审核拒绝
+      status: 'pending',
       createTime: db.serverDate(),
       updateTime: db.serverDate()
     };
@@ -78,6 +97,7 @@ exports.main = async (event, context) => {
 
   } catch (err) {
     console.error('商家注册失败:', err);
+    // 安全修复：不再返回内部错误信息
     return {
       code: 5001,
       message: '注册失败，请稍后重试'

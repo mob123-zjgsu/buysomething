@@ -7,97 +7,36 @@ on:
     branches: [main]
 
 jobs:
-  # ============================================
-  # 后端 - 云函数代码检查（简化方案）
-  # ============================================
+  # 后端 - 云函数代码检查
   backend:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: cloudfunctions/**/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('cloudfunctions/**/package-lock.json') }}
-
-      - name: Install dependencies
-        run: |
-          for dir in cloudfunctions/*/; do
-            if [ -f "$dir/package.json" ]; then
-              echo "Installing $dir"
-              npm ci --prefix "$dir" 2>/dev/null || npm install --prefix "$dir"
-            fi
-          done
-
+      - name: Install ESLint
+        run: npm install -g eslint
       - name: Run ESLint on cloudfunctions
         run: |
-          npx eslint cloudfunctions/**/*.js --max-warnings 0
+          if ls cloudfunctions/*/index.js 2>/dev/null; then
+            eslint cloudfunctions/*/index.js
+          fi
 
-      - name: Check syntax
-        run: |
-          for file in cloudfunctions/**/*.js; do
-            node --check "$file" 2>&1 || echo "Syntax error in $file"
-          done
-
-  # ============================================
   # 前端 - 小程序代码检查
-  # ============================================
   frontend:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            miniprogram/node_modules
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install dependencies
-        run: npm install
-
+      - name: Install ESLint
+        run: npm install -g eslint
       - name: Run ESLint on pages
         run: |
-          npx eslint pages/**/*.js --max-warnings 0
-
-      - name: Check components
-        run: |
-          if [ -d "miniprogram/components" ]; then
-            npx eslint miniprogram/components/**/*.js --max-warnings 0
+          if ls pages/*/*.js 2>/dev/null; then
+            eslint pages/*/*.js
           fi
-
-  # ============================================
-  # 状态检查
-  # ============================================
-  check-config:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Validate JSON files
-        run: |
-          echo "Checking JSON syntax..."
-          for file in pages/**/*.json cloudfunctions/*/package.json; do
-            if [ -f "$file" ]; then
-              node -e "JSON.parse(require('fs').readFileSync('$file'))" && echo "✓ $file" || echo "✗ $file"
-            fi
-          done

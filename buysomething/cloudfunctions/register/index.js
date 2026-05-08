@@ -1,10 +1,25 @@
 const cloud = require('wx-server-sdk');
+const crypto = require('crypto');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 });
 
 const db = cloud.database();
+
+// MD5 哈希函数（仅用于兼容旧数据，新数据请使用 bcrypt）
+function md5(str) {
+  return crypto.createHash('md5').update(str).digest('hex');
+}
+
+// 简单的密码哈希函数（使用多次 MD5 + salt）
+function hashPassword(password, salt) {
+  let hash = password + salt;
+  for (let i = 0; i < 1000; i++) {
+    hash = md5(hash);
+  }
+  return hash;
+}
 
 exports.main = async (event, context) => {
   const { phone, code, password } = event;
@@ -57,12 +72,19 @@ exports.main = async (event, context) => {
       _openid: OPENID
     }).get();
 
+    // 生成密码盐值
+    const salt = md5(phone + Date.now().toString());
+    
+    // 使用改进的哈希方法存储密码
+    const hashedPassword = hashPassword(password, salt);
+
     if (openidCheck.data.length > 0) {
       // 用户已存在,更新信息
       await db.collection('users').doc(openidCheck.data[0]._id).update({
         data: {
           phone: phone,
-          password: password,
+          password: hashedPassword,
+          passwordSalt: salt,
           updateTime: db.serverDate()
         }
       });
@@ -90,7 +112,8 @@ exports.main = async (event, context) => {
       data: {
         _openid: OPENID,
         phone: phone,
-        password: password,
+        password: hashedPassword,
+        passwordSalt: salt,
         nickname: '用户' + phone.substring(7),
         avatar: '/images/default-avatar.png',
         gender: 0,
