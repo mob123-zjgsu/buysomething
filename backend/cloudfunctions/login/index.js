@@ -1,16 +1,32 @@
-const cloud = require('wx-server-sdk')
-const crypto = require('crypto')
+const cloud = require('wx-server-sdk');
+const crypto = require('crypto');
 
 // 初始化 CloudBase
 cloud.init({
   env: 'buysomething-6gbmbtpxff05be35'
-})
+});
 
 const db = cloud.database();
 
-// MD5 加密函数
+// MD5 哈希函数
 function md5(str) {
   return crypto.createHash('md5').update(str).digest('hex');
+}
+
+// 密码验证函数（兼容新旧两种存储方式）
+function verifyPassword(inputPassword, storedPassword, salt) {
+  // 新方式：使用 salt 的哈希
+  if (salt) {
+    let hash = inputPassword + salt;
+    for (let i = 0; i < 1000; i++) {
+      hash = md5(hash);
+    }
+    return hash === storedPassword;
+  }
+  
+  // 旧方式：纯 MD5（兼容旧数据）
+  const inputMd5 = md5(inputPassword);
+  return inputMd5 === storedPassword;
 }
 
 /**
@@ -76,9 +92,9 @@ exports.main = async (event, context) => {
 
     const user = userResult.data[0];
 
-    // 验证密码（数据库存储的是 MD5 加密后的密码）
-    const inputPasswordMd5 = md5(password);
-    if (user.password !== inputPasswordMd5) {
+    // 验证密码（支持新旧两种验证方式）
+    const isValidPassword = verifyPassword(password, user.password, user.passwordSalt);
+    if (!isValidPassword) {
       const result = { code: 1002, message: '密码错误', data: {} };
       if (isHttpCall) return { statusCode: 401, headers, body: JSON.stringify(result) };
       return result;
@@ -98,8 +114,13 @@ exports.main = async (event, context) => {
       }
     }
 
-    // 生成简单的 token（实际应使用 JWT）
-    const token = Buffer.from(`${user._id}:${user.phone}`).toString('base64');
+    // 生成 token（包含过期时间）
+    const tokenData = {
+      userId: user._id,
+      phone: user.phone,
+      exp: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 天过期
+    };
+    const token = Buffer.from(JSON.stringify(tokenData)).toString('base64');
 
     // 返回用户信息（过滤敏感信息）
     const userInfo = {
@@ -129,10 +150,11 @@ exports.main = async (event, context) => {
 
   } catch (err) {
     console.error('登录失败:', err);
+    // 安全修复：不再返回内部错误信息
     const errorResult = {
       code: 2001,
       message: '服务器错误',
-      data: { error: err.message }
+      data: null
     };
     
     if (isHttpCall) {

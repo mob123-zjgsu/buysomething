@@ -1,12 +1,12 @@
-const cloud = require('wx-server-sdk')
-cloud.init({ env: 'buysomething-6gbmbtpxff05be35' })
-const db = cloud.database()
+const cloud = require('wx-server-sdk');
+cloud.init({ env: 'buysomething-6gbmbtpxff05be35' });
+const db = cloud.database();
 
 exports.main = async (event, context) => {
-  const { name, price, description, image, stock, merchantId } = event
+  const { name, price, description, image, stock, merchantId } = event;
 
   if (!name || !price) {
-    return { code: 4001, message: '请填写商品名称和价格' }
+    return { code: 4001, message: '请填写商品名称和价格' };
   }
 
   try {
@@ -22,12 +22,12 @@ exports.main = async (event, context) => {
       rating: 5,
       createTime: db.serverDate(),
       updateTime: db.serverDate()
-    }
+    };
 
-    const result = await db.collection('products').add({ data: productData })
-    return { code: 0, message: '商品已提交，等待审核', data: { productId: result._id } }
+    const result = await db.collection('products').add({ data: productData });
+    return { code: 0, message: '商品已提交，等待审核', data: { productId: result._id } };
   } catch (err) {
-    console.error('添加商品失败:', err)
-    return { code: 5001, message: '添加失败，请稍后重试' }
+    console.error('添加商品失败:', err);
+    return { code: 5001, message: '添加失败，请稍后重试' };
   }
-}
+};

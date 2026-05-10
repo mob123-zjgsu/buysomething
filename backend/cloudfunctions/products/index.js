@@ -1,9 +1,9 @@
-const cloud = require('wx-server-sdk')
+const cloud = require('wx-server-sdk');
 
 // 初始化 CloudBase
 cloud.init({
   env: 'buysomething-6gbmbtpxff05be35'
-})
+});
 
 const db = cloud.database();
 

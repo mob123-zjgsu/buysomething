@@ -1,7 +1,7 @@
-const cloud = require('wx-server-sdk')
+const cloud = require('wx-server-sdk');
 
-cloud.init({ env: 'buysomething-6gbmbtpxff05be35' })
-const db = cloud.database()
+cloud.init({ env: 'buysomething-6gbmbtpxff05be35' });
+const db = cloud.database();
 
 /**
  * 商品详情 API
