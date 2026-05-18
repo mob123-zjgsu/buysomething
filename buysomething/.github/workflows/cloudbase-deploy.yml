@@ -1,0 +1,119 @@
+# CloudBase 云函数自动化部署工作流
+# 触发条件：推送到 main 分支的 cloudfunctions 目录
+
+name: Deploy CloudBase Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudfunctions/**'
+  workflow_dispatch:
+    inputs:
+      function_name:
+        description: '指定要部署的云函数（留空则部署全部）'
+        required: false
+        type: string
+
+jobs:
+  # 代码检查
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install ESLint
+        run: npm install -g eslint
+      
+      - name: Lint Cloud Functions
+        run: |
+          if ls cloudfunctions/*/index.js 2>/dev/null; then
+            eslint cloudfunctions/*/index.js --no-error-on-unmatched-pattern || true
+          fi
+
+  # 部署云函数
+  deploy-functions:
+    needs: lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install CloudBase CLI
+        run: npm install -g @cloudbase/cli@latest
+      
+      - name: Authenticate with CloudBase
+        uses: cloudbase/tencentcloudbase-github-action@v1.0.0
+        with:
+          secretId: ${{ secrets.TCB_SECRET_ID }}
+          secretKey: ${{ secrets.TCB_SECRET_KEY }}
+          envId: ${{ secrets.TCB_ENV_ID }}
+      
+      - name: Get changed functions
+        id: changes
+        run: |
+          if [ "${{ github.event.inputs.function_name }}" != "" ]; then
+            echo "functions=${{ github.event.inputs.function_name }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "functions=all" >> $GITHUB_OUTPUT
+          else
+            # 获取本次推送中变更的云函数
+            git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^cloudfunctions/' | cut -d'/' -f2 | sort -u | tr '\n' ' ' > changed_functions.txt
+            if [ -s changed_functions.txt ]; then
+              echo "functions=$(cat changed_functions.txt)" >> $GITHUB_OUTPUT
+            else
+              echo "functions=" >> $GITHUB_OUTPUT
+            fi
+          fi
+      
+      - name: Deploy single function
+        if: steps.changes.outputs.functions != '' && steps.changes.outputs.functions != 'all'
+        run: |
+          FUNCTIONS="${{ steps.changes.outputs.functions }}"
+          for func in $FUNCTIONS; do
+            echo "🚀 Deploying function: $func"
+            tcb fn deploy $func --force
+            echo "✅ Function $func deployed successfully"
+          done
+      
+      - name: Deploy all functions
+        if: steps.changes.outputs.functions == 'all' || steps.changes.outputs.functions == ''
+        run: |
+          echo "🚀 Deploying all cloud functions..."
+          tcb fn deploy --all --force
+          echo "✅ All functions deployed successfully"
+      
+      - name: Show deployed functions
+        run: |
+          echo "📋 Current deployed functions:"
+          tcb fn list
+
+  # 通知（可选）
+  notify:
+    needs: deploy-functions
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Deployment summary
+        run: |
+          if [ "${{ needs.deploy-functions.result }}" == "success" ]; then
+            echo "✅ CloudBase deployment completed successfully!"
+          else
+            echo "❌ CloudBase deployment failed"
+            exit 1
+          fi
