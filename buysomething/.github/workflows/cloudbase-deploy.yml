@@ -6,8 +6,6 @@ name: Deploy CloudBase Functions
 on:
   push:
     branches: [main]
-    paths:
-      - 'cloudfunctions/**'
   workflow_dispatch:
     inputs:
       function_name:
