@@ -6,31 +6,76 @@ cloud.init({
 
 const db = cloud.database();
 
-exports.main = async (event, context) => {
-  const { phone, password } = event;
+// MD5 哈希函数
+function md5(str) {
+  return cloud.cloudDB ? str : require('crypto').createHash('md5').update(str).digest('hex');
+}
 
-  if (!phone || !password) {
-    return {
-      code: 4001,
-      message: '请输入手机号和密码'
-    };
+// 密码验证函数
+function verifyPassword(inputPassword, storedPassword, salt) {
+  if (!salt) {
+    return inputPassword === storedPassword;
   }
+  let hash = inputPassword + salt;
+  for (let i = 0; i < 1000; i++) {
+    hash = md5(hash);
+  }
+  return hash === storedPassword;
+}
+
+exports.main = async (event, context) => {
+  const { phone, password, code } = event;
 
   try {
     // 查询商家
     const result = await db.collection('merchants').where({
-      phone: phone,
-      password: password
+      phone: phone
     }).get();
 
     if (result.data.length === 0) {
       return {
         code: 4002,
-        message: '手机号或密码错误'
+        message: '商家账号不存在'
       };
     }
 
     const merchant = result.data[0];
+
+    // 验证码登录模式
+    if (code) {
+      // 检查验证码
+      const codeResult = await db.collection('sms_codes')
+        .where({
+          phone: phone,
+          expiresAt: db.command.gt(new Date())
+        })
+        .orderBy('createTime', 'desc')
+        .limit(1)
+        .get();
+
+      if (codeResult.data.length === 0 || codeResult.data[0].code !== code) {
+        return {
+          code: 4005,
+          message: '验证码错误或已过期'
+        };
+      }
+    }
+    // 密码登录模式
+    else if (password) {
+      // 验证密码
+      const isValidPassword = verifyPassword(password, merchant.password, merchant.passwordSalt);
+      if (!isValidPassword) {
+        return {
+          code: 4002,
+          message: '手机号或密码错误'
+        };
+      }
+    } else {
+      return {
+        code: 4001,
+        message: '请输入密码或验证码'
+      };
+    }
 
     // 检查审核状态
     if (merchant.status === 'pending') {
