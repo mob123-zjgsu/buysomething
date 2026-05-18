@@ -15,7 +15,7 @@ function md5(str) {
 
 // 密码验证函数（兼容新旧两种存储方式）
 function verifyPassword(inputPassword, storedPassword, salt) {
-  // 新方式：使用 salt 的哈希
+  // 1. 新方式：使用 salt 的哈希
   if (salt) {
     let hash = inputPassword + salt;
     for (let i = 0; i < 1000; i++) {
@@ -24,9 +24,18 @@ function verifyPassword(inputPassword, storedPassword, salt) {
     return hash === storedPassword;
   }
   
-  // 旧方式：纯 MD5（兼容旧数据）
+  // 2. 旧方式：纯 MD5（兼容旧数据）
   const inputMd5 = md5(inputPassword);
-  return inputMd5 === storedPassword;
+  if (inputMd5 === storedPassword) {
+    return true;
+  }
+  
+  // 3. 测试环境：明文密码兼容（如 123456）
+  if (inputPassword === storedPassword) {
+    return true;
+  }
+  
+  return false;
 }
 
 /**
