@@ -16,9 +16,11 @@ jobs:
       
       - name: Check directory structure
         run: |
+          echo "=== Current directory ==="
           pwd
           ls -la
-          ls -la cloudfunctions/ 2>/dev/null || ls -la buysomething/cloudfunctions/ 2>/dev/null || echo "cloudfunctions not found"
+          echo "=== Looking for cloudfunctions ==="
+          find . -name "cloudfunctions" -type d 2>/dev/null | head -5
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,13 +37,22 @@ jobs:
           TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
         run: |
           export CI=true
-          # 找到 cloudfunctions 目录位置
+          # 找到 cloudfunctions 目录
+          CF_DIR=""
           if [ -d "cloudfunctions" ]; then
-            cd cloudfunctions
+            CF_DIR="cloudfunctions"
           elif [ -d "buysomething/cloudfunctions" ]; then
-            cd buysomething/cloudfunctions
+            CF_DIR="buysomething/cloudfunctions"
           fi
-          pwd
+          
+          if [ -z "$CF_DIR" ]; then
+            echo "Error: cloudfunctions directory not found"
+            exit 1
+          fi
+          
+          echo "Found cloudfunctions at: $CF_DIR"
+          cd "$CF_DIR"
           ls -la
+          
           tcb login --apiKeyId $TCB_SECRET_ID --apiKey $TCB_SECRET_KEY || true
           tcb fn deploy --all --envId $TCB_ENV_ID --force
