@@ -1,0 +1,70 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ============================================
+  # 密钥泄露扫描
+  # ============================================
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+
+  # ============================================
+  # 依赖漏洞扫描
+  # ============================================
+  dependency-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+  # ============================================
+  # 代码安全检查
+  # ============================================
+  code-security:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "检查敏感信息..."
+          
+          # 检查是否有硬编码的密码（排除 node_modules 和测试文件）
+          if grep -r "password.*=.*['\"][^'\"]{6,}['\"]" cloudfunctions/ --include="*.js" | grep -v "test\|spec\|node_modules" | grep -v "# 注释\|comment"; then
+            echo "⚠️ 发现可能的硬编码密码"
+            exit 1
+          fi
+          
+          # 检查是否有硬编码的 API Key
+          if grep -rE "api[_-]?key.*=.*['\"][a-zA-Z0-9]{20,}['\"]" cloudfunctions/ --include="*.js" | grep -v "test\|spec\|node_modules"; then
+            echo "⚠️ 发现可能的硬编码 API Key"
+            exit 1
+          fi
+          
+          echo "✅ 未发现明显的硬编码敏感信息"

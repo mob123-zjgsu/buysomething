@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # 后端 - 云函数代码检查
+  backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install ESLint
+        run: npm install -g eslint
+      - name: Run ESLint on cloudfunctions
+        run: |
+          if ls cloudfunctions/*/index.js 2>/dev/null; then
+            eslint cloudfunctions/*/index.js
+          fi
+
+  # 前端 - 小程序代码检查
+  frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install ESLint
+        run: npm install -g eslint
+      - name: Run ESLint on pages
+        run: |
+          if ls pages/*/*.js 2>/dev/null; then
+            eslint pages/*/*.js
+          fi
