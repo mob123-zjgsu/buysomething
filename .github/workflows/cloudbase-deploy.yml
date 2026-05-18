@@ -14,6 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Check directory structure
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          ls -la
+          echo "=== Looking for cloudfunctions ==="
+          find . -name "cloudfunctions" -type d 2>/dev/null | head -5
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -22,10 +30,6 @@ jobs:
       - name: Install CloudBase CLI
         run: npm install -g @cloudbase/cli@latest
       
-      - name: Configure CLI
-        run: |
-          echo "y" | tcb login --apiKeyId ${{ secrets.TCB_SECRET_ID }} --apiKey ${{ secrets.TCB_SECRET_KEY }} || true
-      
       - name: Deploy to CloudBase
         env:
           TCB_SECRET_ID: ${{ secrets.TCB_SECRET_ID }}
@@ -33,5 +37,22 @@ jobs:
           TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
         run: |
           export CI=true
-          cd cloudfunctions
+          # 找到 cloudfunctions 目录
+          CF_DIR=""
+          if [ -d "cloudfunctions" ]; then
+            CF_DIR="cloudfunctions"
+          elif [ -d "buysomething/cloudfunctions" ]; then
+            CF_DIR="buysomething/cloudfunctions"
+          fi
+          
+          if [ -z "$CF_DIR" ]; then
+            echo "Error: cloudfunctions directory not found"
+            exit 1
+          fi
+          
+          echo "Found cloudfunctions at: $CF_DIR"
+          cd "$CF_DIR"
+          ls -la
+          
+          tcb login --apiKeyId $TCB_SECRET_ID --apiKey $TCB_SECRET_KEY || true
           tcb fn deploy --all --envId $TCB_ENV_ID --force
