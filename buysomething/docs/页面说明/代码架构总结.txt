@@ -1,0 +1,233 @@
+# 小程序整体架构总结
+
+## 一、系统架构图
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         用户端（微信小程序）                            │
+│                                                                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────────┐ │
+│  │    首页      │  │   分类页     │  │   购物车     │  │   我的     │ │
+│  │  home.js    │  │ category.js │  │   cart.js   │  │ profile.js │ │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └────────────┘ │
+│         ↓                ↓               ↓               ↓         │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────────┐ │
+│  │ 商品列表页   │  │ 商品详情页    │  │  登录/注册   │  │  订单页    │ │
+│  │product-list │  │product-detail│  │ login/register│ │ order-list│ │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
+                                    ↓
+                         wx.cloud.callFunction()
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────┐
+│                        CloudBase 云端                                │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                        云函数层                                │  │
+│  │  ┌─────────┐ ┌──────────┐ ┌──────────┐ ┌───────────────┐  │  │
+│  │  │  login  │ │ register │ │ products │ │product-detail │  │  │
+│  │  └─────────┘ └──────────┘ └──────────┘ └───────────────┘  │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                    ↓                               │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                       数据库层 (NoSQL)                         │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐  │  │
+│  │  │  users   │ │ products │ │  orders  │ │    cart     │  │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────────┘  │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 二、数据流向
+
+### 用户注册流程
+```
+用户输入手机号/密码/验证码
+        ↓
+register.js → wx.cloud.callFunction({ name: 'register' })
+        ↓
+┌─────────────────────────────────┐
+│      register 云函数处理          │
+│  1. 验证参数                    │
+│  2. 检查是否已注册               │
+│  3. 获取用户 OpenID             │
+│  4. 在 users 集合创建新文档       │
+└─────────────────────────────────┘
+        ↓
+返回 { success: true, userInfo: {...} }
+        ↓
+app.login(userInfo) → 保存登录状态
+```
+
+### 商品浏览流程
+```
+用户进入首页 → home.js onLoad()
+        ↓
+wx.cloud.callFunction({ name: 'products', data: { page: 1 } })
+        ↓
+┌─────────────────────────────────┐
+│      products 云函数处理          │
+│  1. 分页查询 products 集合       │
+│  2. 过滤无效数据                │
+│  3. 返回商品列表                │
+└─────────────────────────────────┘
+        ↓
+setData({ products: [...] })
+        ↓
+渲染商品列表
+```
+
+### 购物车流程
+```
+用户点击"加入购物车" → product-detail.js addToCart()
+        ↓
+创建购物车商品对象
+        ↓
+wx.setStorageSync('cart', cart)  ← 本地存储
+        ↓
+显示"添加成功"
+```
+
+---
+
+## 三、前后端交互模式
+
+### 模式1：调用云函数
+```javascript
+// 前端
+const res = await wx.cloud.callFunction({
+  name: '云函数名称',
+  data: { 参数 }
+})
+
+// 后端 (云函数)
+exports.main = async (event, context) => {
+  const db = cloud.database()
+  const result = await db.collection('集合名').get()
+  return { code: 0, data: result }
+}
+```
+
+### 模式2：本地存储
+```javascript
+// 前端 - 保存
+wx.setStorageSync('key', value)
+
+// 前端 - 读取
+const value = wx.getStorageSync('key')
+
+// 适用场景：购物车、临时数据、不需要云端同步的数据
+```
+
+---
+
+## 四、文件对应关系
+
+| 前端页面 | 调用的云函数 | 操作的数据 |
+|---------|------------|-----------|
+| pages/home/home | products | 读取商品列表 |
+| pages/product-list/product-list | products | 读取商品列表（带筛选）|
+| pages/product-detail/product-detail | product-detail | 读取商品详情 |
+| pages/login/login | login | 验证登录 |
+| pages/register/register | register, sendSmsCode | 创建用户、发送验证码 |
+| pages/cart/cart | 无（本地存储） | 购物车数据 |
+| pages/order-list/order-list | orders | 读取订单列表 |
+| pages/order-detail/order-detail | orders | 订单详情/创建订单 |
+
+---
+
+## 五、认证机制
+
+### 微信小程序认证流程
+```
+用户打开小程序
+    ↓
+微信自动分配 OpenID（用户唯一标识）
+    ↓
+OpenID 传递给云函数
+    ↓
+云函数通过 OpenID 识别用户
+    ↓
+用户只能操作自己的数据
+```
+
+### 登录状态管理
+```javascript
+// app.js
+globalData: {
+  isLogin: false,      // 登录状态
+  userInfo: null       // 用户信息
+}
+
+// 登录成功后
+app.globalData.isLogin = true
+app.globalData.userInfo = userInfo
+
+// 其他页面判断
+const app = getApp()
+if (app.globalData.isLogin) {
+  // 已登录
+}
+```
+
+---
+
+## 六、组件复用机制
+
+### 已封装的组件
+```
+miniprogram/components/
+├── product-card/     # 商品卡片
+├── loading/          # 加载状态
+├── empty-state/      # 空状态提示
+├── order-item/       # 订单项
+└── cloudbase-badge/  # 徽章组件
+```
+
+### 组件使用示例
+```javascript
+// 1. 在页面的 .json 中引入
+{
+  "usingComponents": {
+    "product-card": "/miniprogram/components/product-card/index"
+  }
+}
+
+// 2. 在 .wxml 中使用
+<product-card 
+  product="{{productItem}}"
+  bind:addcart="onAddCart"
+/>
+
+// 3. 在 .js 中处理事件
+onAddCart(e) {
+  console.log(e.detail)  // 商品数据
+}
+```
+
+---
+
+## 七、答辩常见问题回答
+
+### Q1: 你的后端是怎么连接的？
+**A**: 我的小程序使用 CloudBase 云开发，在 `app.js` 中通过 `wx.cloud.init()` 初始化连接，云函数通过 `wx-server-sdk` 操作云数据库，无需手动编写数据库连接代码。
+
+### Q2: 用户数据存在哪里？
+**A**: 用户数据存在 CloudBase 的 `users` 集合中，每个用户通过微信自动分配的 `OpenID` 标识，云函数自动获取并验证用户身份。
+
+### Q3: 商品数据是怎么获取的？
+**A**: 商品数据通过调用 `products` 云函数获取，该函数查询 `products` 集合并返回分页后的商品列表，支持按分类筛选。
+
+### Q4: 为什么有些数据存本地有些存云端？
+**A**: 
+- 购物车存本地：访问频繁、本地操作更快、离线可用
+- 用户/商品存云端：需要多设备同步、数据需要实时更新
+
+### Q5: 如何保证数据安全？
+**A**:
+1. 微信 OpenID 机制确保用户身份唯一
+2. 云函数自动获取 OpenID，用户无法伪造
+3. 数据库安全规则限制用户只能访问自己的数据
+4. 所有参数在云函数中进行验证

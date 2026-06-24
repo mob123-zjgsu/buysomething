@@ -1,0 +1,7 @@
+.add-product { padding: 32rpx; background: #F5F5F5; min-height: 100vh; }
+.form { background: #FFF; border-radius: 16rpx; padding: 32rpx; }
+.form-item { margin-bottom: 32rpx; }
+.label { font-size: 28rpx; color: #666; display: block; margin-bottom: 12rpx; }
+.input { height: 80rpx; padding: 0 24rpx; background: #F5F5F5; border-radius: 40rpx; font-size: 28rpx; }
+.textarea { padding: 24rpx; background: #F5F5F5; border-radius: 16rpx; font-size: 28rpx; width: 100%; box-sizing: border-box; }
+.btn { background: linear-gradient(135deg, #667eea, #764ba2); color: #FFF; height: 96rpx; line-height: 96rpx; border-radius: 48rpx; font-size: 32rpx; margin-top: 40rpx; }

@@ -1,0 +1,190 @@
+# pages/product-detail/product-detail - 商品详情页说明
+
+## 文件位置
+- JS: `buysomething/pages/product-detail/product-detail.js`
+- WXML: `buysomething/pages/product-detail/product-detail.wxml`
+- WXSS: `buysomething/pages/product-detail/product-detail.wxss`
+
+## 整体作用
+展示商品详情信息，支持规格选择、加入购物车、立即购买、收藏等功能
+
+## JS 函数详解
+
+### 1. onLoad(options)
+```
+位置：product-detail.js 第 20 行
+作用：页面加载，获取商品ID
+参数：options.id - 商品ID（从 URL 参数获取）
+执行：
+  1. 从 URL 参数获取商品ID
+  2. 调用 loadProductDetail(id) 加载详情
+  3. 如果没有ID，显示错误并返回
+```
+
+### 2. loadProductDetail(productId)
+```
+位置：product-detail.js 第 40-103 行
+作用：从云端加载商品详情
+调用云函数：product-detail
+
+参数：
+  - productId: 商品ID
+
+执行流程：
+  1. 设置 loading = true
+  2. 调用 wx.cloud.callFunction({ name: 'product-detail', data: { productId } })
+  3. 获取返回的商品数据
+  4. 处理数据格式，转换图片URL
+  5. 设置商品数据到 this.data.product
+  6. 设置 loading = false
+
+返回数据结构：
+{
+  productId: '商品ID',
+  name: '商品名称',
+  price: 99,
+  originalPrice: 199,
+  images: ['图片1', '图片2'],
+  colors: ['红色', '蓝色'],
+  sizes: ['S', 'M', 'L'],
+  specs: { colors: [...], sizes: [...] },
+  stock: 100,
+  sales: 1000,
+  rating: 4.8
+}
+```
+
+### 3. addToCart()
+```
+位置：product-detail.js 第 200-270 行
+作用：添加商品到购物车
+执行流程：
+  1. 检查规格选择（颜色/尺寸）
+     - 有规格但未选择：自动选择第一个
+  2. 读取本地购物车数据
+  3. 创建购物车商品对象
+  4. 检查是否已存在相同商品
+     - 存在：累加数量
+     - 不存在：添加新项
+  5. 保存到本地存储 wx.setStorageSync('cart', cart)
+  6. 显示添加成功提示
+
+购物车商品对象结构：
+{
+  productId: '商品ID',
+  name: '商品名称',
+  price: 99,
+  image: '图片URL',
+  color: '红色',
+  size: 'M',
+  quantity: 1,
+  selected: true
+}
+```
+
+### 4. buyNow()
+```
+位置：product-detail.js 第 275-325 行
+作用：立即购买
+执行流程：
+  1. 检查规格选择
+  2. 检查登录状态（未登录跳转登录页）
+  3. 创建订单商品对象
+  4. 保存到 pendingOrder
+  5. 跳转到订单确认页
+```
+
+### 5. selectColor() / selectSize()
+```
+位置：product-detail.js 第 121-131 行
+作用：选择商品规格
+更新：selectedColor / selectedSize
+```
+
+### 6. openSpecSelector() / closeSpecSelector()
+```
+位置：product-detail.js 第 113-119 行
+作用：打开/关闭规格选择弹窗
+```
+
+### 7. toggleFavorite()
+```
+位置：product-detail.js 第 191-199 行
+作用：收藏/取消收藏（本地状态）
+```
+
+## 与后端交互
+
+```
+┌────────────────────────────────────────────────────────┐
+│               product-detail.js                          │
+│                                                          │
+│  loadProductDetail(productId)                            │
+│         ↓                                               │
+│  wx.cloud.callFunction({                                 │
+│    name: 'product-detail',  ←─── 商品详情云函数         │
+│    data: { productId: 'xxx' }                         │
+│  })                                                    │
+│         ↓                                               │
+│  ┌──────────────────────────────────────────┐          │
+│  │       CloudBase product-detail 云函数         │          │
+│  │                                            │          │
+│  │  1. db.collection('products').doc(id).get()│          │
+│  │  2. 转换图片URL（外部链接→本地）           │          │
+│  │  3. 处理规格数据（colors/sizes）           │          │
+│  │  4. 返回完整商品信息                       │          │
+│  └──────────────────────────────────────────┘          │
+└────────────────────────────────────────────────────────┘
+```
+
+## 数据流向
+
+```
+商品详情页 ←── URL参数?id=商品ID
+     ↓
+loadProductDetail(id)
+     ↓
+wx.cloud.callFunction('product-detail')
+     ↓
+┌─────────────────────────────────────┐
+│         products 集合                  │
+│  {                                   │
+│    _id: '商品ID',                     │
+│    name: '夏季新款T恤',               │
+│    price: 99,                         │
+│    image: '/images/product1.jpg',    │
+│    specs: { colors: ['红'], sizes: ['M'] }  │
+│  }                                    │
+└─────────────────────────────────────┘
+     ↓
+设置 this.data.product
+     ↓
+渲染页面：图片轮播、价格、规格选择、加入购物车
+```
+
+## 页面结构
+
+```
+┌─────────────────────────────────────┐
+│        商品图片轮播                     │
+│   <swiper> ← images 数组            │
+└─────────────────────────────────────┘
+     ↓
+┌─────────────────────────────────────┐
+│        商品信息区域                    │
+│   价格：{{product.price}}           │
+│   原价：{{product.originalPrice}}   │
+│   名称：{{product.name}}           │
+│   销量：{{product.sales}}          │
+└─────────────────────────────────────┘
+     ↓
+┌─────────────────────────────────────┐
+│        规格选择区域                    │
+│   <picker> ← colors/sizes 数组       │
+└─────────────────────────────────────┘
+     ↓
+┌─────────────────────────────────────┐
+│        底部操作栏                      │
+│   [客服] [收藏] [加入购物车] [立即购买] │
+└─────────────────────────────────────┘
+```

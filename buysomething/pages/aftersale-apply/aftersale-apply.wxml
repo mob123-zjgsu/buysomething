@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="form-card">
+    <text class="form-title">申请售后</text>
+
+    <view class="form-group">
+      <text class="form-label">售后类型</text>
+      <picker class="form-picker" mode="selector" range="{{typeOptions}}" value="{{typeIndex}}" bindchange="onTypeChange">
+        <view class="picker-value">{{typeOptions[typeIndex]}} ▾</view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">申请理由 *</text>
+      <textarea class="form-textarea" placeholder="请简要说明申请售后的原因" value="{{reason}}" bindinput="onReasonInput" maxlength="200" />
+      <text class="char-count">{{reason.length}}/200</text>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">详细描述（选填）</text>
+      <textarea class="form-textarea" placeholder="请详细描述问题，便于商家和管理员审核" value="{{detail}}" bindinput="onDetailInput" maxlength="500" />
+      <text class="char-count">{{detail.length}}/500</text>
+    </view>
+
+    <view class="flow-hint">
+      <text class="hint-title">售后流程</text>
+      <view class="flow-steps">
+        <view class="flow-step">
+          <text class="step-dot">1</text>
+          <text class="step-text">提交申请</text>
+        </view>
+        <text class="flow-arrow">→</text>
+        <view class="flow-step">
+          <text class="step-dot">2</text>
+          <text class="step-text">商家审核</text>
+        </view>
+        <text class="flow-arrow">→</text>
+        <view class="flow-step">
+          <text class="step-dot">3</text>
+          <text class="step-text">如有异议管理员裁定</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <button class="btn-submit" bindtap="onSubmit" disabled="{{submitting}}">提交售后申请</button>
+</view>

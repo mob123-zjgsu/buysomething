@@ -1,0 +1,63 @@
+<view class="container">
+  <view class="tabs">
+    <view class="tab {{activeTab === 'disputed' ? 'active' : ''}}" bindtap="switchTab" data-tab="disputed">待裁定</view>
+    <view class="tab {{activeTab === 'resolved' ? 'active' : ''}}" bindtap="switchTab" data-tab="resolved">已裁定</view>
+    <view class="tab {{activeTab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">全部</view>
+  </view>
+
+  <view class="empty" wx:if="{{list.length === 0}}">
+    <text class="empty-icon">⚖️</text>
+    <text class="empty-text">暂无售后记录</text>
+  </view>
+
+  <view class="list">
+    <view class="card" wx:for="{{list}}" wx:key="id" wx:if="{{activeTab === 'all' || (activeTab === 'disputed' && item.status === 'rejected') || (activeTab === 'resolved' && (item.status === 'admin_approved' || item.status === 'admin_rejected'))}}">
+      <view class="card-header">
+        <text class="order-no">{{item.orderNo}}</text>
+        <text class="status-tag {{item.status}}">{{item.statusText}}</text>
+      </view>
+
+      <view class="card-body">
+        <!-- 用户申请信息 -->
+        <view class="section user-section">
+          <text class="section-label">👤 用户申请</text>
+          <view class="info-row">
+            <text class="info-label">类型</text>
+            <text class="info-value">{{item.type}}</text>
+          </view>
+          <view class="info-row">
+            <text class="info-label">理由</text>
+            <text class="info-value">{{item.reason}}</text>
+          </view>
+          <view class="info-row" wx:if="{{item.detail}}">
+            <text class="info-label">详情</text>
+            <text class="info-value">{{item.detail}}</text>
+          </view>
+        </view>
+
+        <!-- 商家反对意见 -->
+        <view class="section merchant-section" wx:if="{{item.merchantReply}}">
+          <text class="section-label">🏪 商家意见</text>
+          <text class="section-content">{{item.merchantReply}}</text>
+        </view>
+
+        <!-- 管理员裁定结果 -->
+        <view class="section admin-section" wx:if="{{item.status === 'admin_approved' || item.status === 'admin_rejected'}}">
+          <text class="section-label">⚖️ 管理员裁定</text>
+          <text class="section-content {{item.status}}">{{item.adminReply || (item.status === 'admin_approved' ? '同意售后' : '驳回售后')}}</text>
+        </view>
+
+        <view class="info-row">
+          <text class="info-label">申请时间</text>
+          <text class="info-value time">{{item.createTimeStr}}</text>
+        </view>
+      </view>
+
+      <!-- 管理员裁定操作 -->
+      <view class="card-actions" wx:if="{{item.status === 'rejected'}}">
+        <button class="btn btn-approve" bindtap="adminApprove" data-id="{{item.id}}">裁定同意</button>
+        <button class="btn btn-reject" bindtap="adminReject" data-id="{{item.id}}">裁定驳回</button>
+      </view>
+    </view>
+  </view>
+</view>

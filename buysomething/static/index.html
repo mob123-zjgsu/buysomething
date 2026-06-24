@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>优选购物 - 小程序</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #FFF5F5 0%, #F0FFFE 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 60px 50px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(255, 107, 107, 0.12);
+      max-width: 480px;
+      width: 90%;
+    }
+    .icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #FF6B6B;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .info-item {
+      background: #F8F9FA;
+      border-radius: 12px;
+      padding: 16px 12px;
+    }
+    .info-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    .info-value.green { color: #4ECDC4; }
+    .status-badge {
+      display: inline-block;
+      background: #E8F8F5;
+      color: #4ECDC4;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🛒</div>
+    <h1>优选购物</h1>
+    <p class="subtitle">微信小程序 · CloudBase 全栈应用</p>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">部署平台</div>
+        <div class="info-value">CloudBase</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">服务状态</div>
+        <div class="info-value green">● 运行中</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">云函数</div>
+        <div class="info-value">17 个</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">数据库</div>
+        <div class="info-value green">正常</div>
+      </div>
+    </div>
+
+    <div class="status-badge">✅ 部署成功</div>
+    <p class="footer">CloudBase 静态托管 · HTTPS 已启用</p>
+  </div>
+</body>
+</html>

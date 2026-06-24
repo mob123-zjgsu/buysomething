@@ -1,0 +1,22 @@
+<view class="category-container">
+  <view class="category-sidebar">
+    <scroll-view scroll-y class="sidebar-scroll">
+      <view class="category-item {{activeIndex === index ? 'active' : ''}}" wx:for="{{categories}}" wx:key="id" bindtap="selectCategory" data-index="{{index}}" data-id="{{item.id}}">
+        <text class="category-name">{{item.name}}</text>
+      </view>
+    </scroll-view>
+  </view>
+  <view class="category-content">
+    <view class="subcategory-list">
+      <view class="subcategory-group" wx:for="{{subcategories}}" wx:key="name">
+        <view class="subcategory-title">{{item.name}}</view>
+        <view class="subcategory-items">
+          <view class="subcategory-item" wx:for="{{item.items}}" wx:for-item="subitem" wx:key="id" bindtap="goToProductList" data-id="{{subitem.id}}">
+            <image class="subcategory-image" src="{{subitem.image}}" mode="aspectFill"></image>
+            <text class="subcategory-text">{{subitem.name}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

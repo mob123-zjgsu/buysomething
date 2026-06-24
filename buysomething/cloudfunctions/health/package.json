@@ -1,0 +1,9 @@
+{
+  "name": "health",
+  "version": "1.0.0",
+  "description": "健康检查云函数 - 监控服务状态",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

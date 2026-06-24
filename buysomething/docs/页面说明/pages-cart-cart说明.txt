@@ -1,0 +1,200 @@
+# pages/cart/cart - 购物车页面说明
+
+## 文件位置
+- JS: `buysomething/pages/cart/cart.js`
+- WXML: `buysomething/pages/cart/cart.wxml`
+- WXSS: `buysomething/pages/cart/cart.wxss`
+
+## 整体作用
+展示购物车商品列表，支持选择商品、修改数量、删除、结算等功能
+
+## JS 函数详解
+
+### 1. onLoad() / onShow()
+```
+位置：cart.js 第 11-17 行
+作用：页面加载/显示时触发
+执行：调用 loadCart() 加载购物车数据
+说明：
+  - onLoad: 首次进入页面
+  - onShow: 每次从其他页面返回（确保数据同步）
+```
+
+### 2. loadCart()
+```
+位置：cart.js 第 19-24 行
+作用：加载购物车数据
+数据来源：wx.getStorageSync('cart') - 本地存储
+执行流程：
+  1. 读取本地存储中的 cart 数据
+  2. 设置到 cartItems 数组
+  3. 调用 groupCartByShop() 按店铺分组
+  4. 调用 calculateTotal() 计算总价
+```
+
+### 3. groupCartByShop()
+```
+位置：cart.js 第 26-50 行
+作用：将购物车商品按店铺分组
+数据处理：
+  1. 将 cartItems 映射为 groupedCart 数组
+  2. 每个分组包含：
+     - shopId: 店铺ID
+     - shopName: 店铺名称（固定"优选自营"）
+     - products: 商品列表
+  3. 为每个商品生成 uniqueId
+     - 格式：productId_color_size
+     - 用于标识同一商品不同规格
+  4. 检查全选状态
+```
+
+### 4. calculateTotal()
+```
+位置：cart.js 第 178-195 行
+作用：计算选中商品的总价和总数量
+计算逻辑：
+  1. 遍历所有商品
+  2. 只计算 selected = true 的商品
+  3. 总价 += price * quantity
+  4. 总数量 += quantity
+```
+
+### 5. toggleItemSelect()
+```
+位置：cart.js 第 79-101 行
+作用：勾选/取消单个商品
+参数：
+  - shopId: 店铺ID
+  - productId: uniqueId（商品唯一标识）
+执行：
+  1. 找到对应商品
+  2. 反转 selected 状态
+  3. 更新店铺和全局全选状态
+  4. 保存到本地存储
+  5. 重新计算总价
+```
+
+### 6. toggleSelectAll()
+```
+位置：cart.js 第 103-117 行
+作用：全选/取消全选
+执行：
+  1. 反转 allSelected 状态
+  2. 更新所有商品 selected 状态
+  3. 保存到本地存储
+  4. 重新计算总价
+```
+
+### 7. decreaseQuantity() / increaseQuantity()
+```
+位置：cart.js 第 119-155 行
+作用：减少/增加商品数量
+参数：
+  - shopId: 店铺ID
+  - productId: uniqueId
+限制：
+  - 数量最少为 1（decreaseQuantity 不会再减少）
+  - 增加无上限
+```
+
+### 8. handleCheckout()
+```
+位置：cart.js 第 210-262 行
+作用：结算按钮点击
+分支逻辑：
+  1. 如果 isEditMode = true → 删除选中商品
+     - 显示确认对话框
+     - 调用 deleteSelectedItems()
+  2. 否则 → 结算流程
+     - 检查登录状态
+     - 未登录跳转登录页
+     - 收集选中商品
+     - 保存到 pendingOrder
+     - 跳转到订单确认页
+```
+
+### 9. deleteSelectedItems()
+```
+位置：cart.js 第 264-293 行
+作用：删除选中的商品
+执行：
+  1. 过滤掉 selected = true 的商品
+  2. 移除空店铺
+  3. 更新本地存储
+  4. 重新计算购物车数量
+  5. 显示删除成功提示
+```
+
+## 购物车数据结构
+
+```javascript
+// 本地存储中的购物车数据
+cart = [
+  {
+    productId: '商品ID',
+    name: '商品名称',
+    price: 99,
+    image: '/images/product1.jpg',
+    color: '红色',
+    size: 'M',
+    quantity: 2,
+    selected: true
+  },
+  // ... 更多商品
+]
+
+// 页面分组后的数据结构
+groupedCart = [
+  {
+    shopId: '1',
+    shopName: '优选自营',
+    allSelected: true,
+    products: [
+      {
+        ...cartItem,
+        uniqueId: '商品ID_红色_M'  // 用于 WX:for 的 key
+      }
+    ]
+  }
+]
+```
+
+## 与后端交互
+
+```
+┌────────────────────────────────────────────────────────┐
+│                    cart.js                              │
+│                                                          │
+│  loadCart()                                             │
+│     ↓                                                   │
+│  wx.getStorageSync('cart')  ←─── 读取本地存储          │
+│                                                          │
+│  数据不在云端，在本地！                                   │
+│  这与其他页面调用云函数不同                                │
+└────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────┐
+│                    后端云函数                            │
+│                                                          │
+│  购物车数据 → 本地存储 (wx.getStorageSync)            │
+│                                                          │
+│  商品数据 → 云函数 (wx.cloud.callFunction)            │
+│  例：products, product-detail                          │
+└────────────────────────────────────────────────────────┘
+```
+
+## 设计说明
+
+**为什么购物车用本地存储而非云端？**
+
+| 存储方式 | 优点 | 缺点 |
+|---------|------|------|
+| 本地存储 | 速度快、离线可用、节省云资源 | 换设备数据不同步 |
+| 云端存储 | 多设备同步 | 需要网络、消耗资源 |
+
+**当前设计**：
+- 购物车：本地存储（轻量、快速）
+- 商品信息：云端（实时更新价格/库存）
+- 用户数据：云端（users 集合）
+
+**如果是真实电商项目**，购物车应该同步到云端，但会增加开发复杂度。

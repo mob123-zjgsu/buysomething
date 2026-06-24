@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/**",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/health",
+      "dest": "/frontend/server.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/frontend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/server.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}

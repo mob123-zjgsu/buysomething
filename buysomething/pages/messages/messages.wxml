@@ -1,0 +1,23 @@
+<view class="messages-container">
+  <view class="header-bar">
+    <text class="title">消息中心 ({{unreadCount}}未读)</text>
+    <text class="read-all" bindtap="markAllRead" wx:if="{{unreadCount > 0}}">全部已读</text>
+  </view>
+
+  <view class="empty" wx:if="{{messages.length === 0}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无消息</text>
+  </view>
+
+  <view class="msg-list">
+    <view class="msg-item {{item.isRead ? '' : 'unread'}}" wx:for="{{messages}}" wx:key="_id" bindtap="markRead" data-id="{{item._id}}">
+      <view class="msg-icon">🔔</view>
+      <view class="msg-content">
+        <text class="msg-title">{{item.title || '系统通知'}}</text>
+        <text class="msg-desc">{{item.content || item.desc || ''}}</text>
+        <text class="msg-time">{{item.time}}</text>
+      </view>
+      <view class="unread-dot" wx:if="{{!item.isRead}}"></view>
+    </view>
+  </view>
+</view>

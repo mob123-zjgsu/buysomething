@@ -1,0 +1,21 @@
+<view class="chat-list-container">
+  <view class="empty" wx:if="{{conversations.length === 0}}">
+    <text class="empty-icon">💬</text>
+    <text class="empty-text">暂无客户消息</text>
+  </view>
+
+  <view class="conv-item" wx:for="{{conversations}}" wx:key="conversationId" bindtap="openChat" data-index="{{index}}">
+    <view class="conv-avatar">👤</view>
+    <view class="conv-info">
+      <view class="conv-top">
+        <text class="conv-name">{{item.userName || '用户'}}</text>
+        <text class="conv-time">{{item.timeStr}}</text>
+      </view>
+      <view class="conv-bottom">
+        <text class="conv-product">{{item.productName || '商品咨询'}}</text>
+        <text class="conv-msg">{{item.lastMessage}}</text>
+      </view>
+    </view>
+    <view class="unread-badge" wx:if="{{item.unreadByMerchant}}">1</view>
+  </view>
+</view>

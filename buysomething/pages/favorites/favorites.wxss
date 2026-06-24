@@ -1,0 +1,13 @@
+.favorites-container { background: #f5f5f5; min-height: 100vh; }
+.empty { text-align: center; padding: 200rpx 0; }
+.empty-icon { font-size: 100rpx; display: block; }
+.empty-text { font-size: 28rpx; color: #999; display: block; margin-top: 20rpx; }
+.empty-tip { font-size: 24rpx; color: #ccc; display: block; margin-top: 10rpx; }
+.fav-list { padding: 20rpx; }
+.fav-item { display: flex; background: #fff; border-radius: 12rpx; padding: 20rpx; margin-bottom: 16rpx; }
+.fav-img { width: 120rpx; height: 120rpx; border-radius: 8rpx; flex-shrink: 0; }
+.fav-info { flex: 1; margin-left: 20rpx; display: flex; flex-direction: column; justify-content: space-between; }
+.fav-name { font-size: 28rpx; color: #333; }
+.fav-price-row { display: flex; justify-content: space-between; align-items: center; }
+.fav-price { font-size: 32rpx; color: #e74c3c; font-weight: bold; }
+.fav-remove { font-size: 24rpx; color: #999; padding: 8rpx 16rpx; }

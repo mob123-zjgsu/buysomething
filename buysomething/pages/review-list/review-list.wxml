@@ -1,0 +1,20 @@
+<view class="review-list-container">
+  <view class="empty" wx:if="{{reviews.length === 0}}">
+    <text class="empty-icon">📝</text>
+    <text class="empty-text">暂无评价</text>
+  </view>
+
+  <view class="review-item" wx:for="{{reviews}}" wx:key="_id">
+    <view class="review-header">
+      <view class="reviewer-avatar">{{item.nickName || '用户'}}</view>
+      <view class="reviewer-info">
+        <text class="reviewer-name">{{item.nickName || '匿名用户'}}</text>
+        <view class="review-stars">
+          <text wx:for="{{[1,2,3,4,5]}}" wx:for-item="star" wx:key="*this" class="star-icon">{{star <= item.rating ? '⭐' : '☆'}}</text>
+        </view>
+      </view>
+      <text class="review-time">{{item.timeStr}}</text>
+    </view>
+    <view class="review-body">{{item.content}}</view>
+  </view>
+</view>

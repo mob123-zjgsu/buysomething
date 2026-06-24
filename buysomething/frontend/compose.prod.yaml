@@ -1,0 +1,33 @@
+# ================================================
+# 优选购物小程序 - 前端生产环境 Docker Compose
+# 使用方法: docker compose -f compose.prod.yaml up -d
+# ================================================
+
+services:
+  # 前端演示服务（生产环境）
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY:-buysomething}/frontend:${VERSION:-latest}
+    container_name: buysomething-frontend-prod
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    networks:
+      - frontend-network
+
+networks:
+  frontend-network:
+    driver: bridge

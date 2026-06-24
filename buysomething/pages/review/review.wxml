@@ -1,0 +1,38 @@
+<view class="review-container">
+  <view class="review-title">发表评价</view>
+
+  <!-- 评分 -->
+  <view class="rating-section">
+    <text class="label">商品评分</text>
+    <view class="stars">
+      <text class="star {{index < rating ? 'active' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" bindtap="setRating" data-rating="{{item}}">{{index < rating ? '⭐' : '☆'}}</text>
+    </view>
+  </view>
+
+  <!-- 评价内容 -->
+  <view class="content-section">
+    <text class="label">评价内容</text>
+    <textarea class="review-textarea" placeholder="分享你的使用感受吧~" value="{{content}}" bindinput="onInput" maxlength="500" />
+    <text class="char-count">{{content.length}}/500</text>
+  </view>
+
+  <!-- 图片上传 -->
+  <view class="image-section">
+    <text class="label">晒图（选填）</text>
+    <view class="image-list">
+      <view class="image-item" wx:for="{{images}}" wx:key="*this">
+        <image class="review-img" src="{{item}}" mode="aspectFill" />
+        <text class="del-img" bindtap="removeImage" data-index="{{index}}">✕</text>
+      </view>
+      <view class="add-image" bindtap="chooseImage" wx:if="{{images.length < 6}}">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加图片</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交 -->
+  <view class="submit-section">
+    <button class="submit-btn" bindtap="submitReview">提交评价</button>
+  </view>
+</view>

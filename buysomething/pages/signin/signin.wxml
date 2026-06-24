@@ -1,0 +1,36 @@
+<view class="signin-container">
+  <view class="signin-header">
+    <text class="signin-title">签到有礼</text>
+    <text class="signin-subtitle">每日签到领红包</text>
+  </view>
+
+  <view class="signin-card">
+    <text class="signin-count">已连续签到 {{signCount}} 天</text>
+    <button class="signin-btn {{todaySigned ? 'signed' : ''}}" bindtap="doSignIn">
+      {{todaySigned ? '✅ 今日已签到' : '📝 立即签到'}}
+    </button>
+    <text class="signin-reward" wx:if="{{reward > 0}}">本次获得 ¥{{reward}} 红包</text>
+  </view>
+
+  <view class="reward-rules">
+    <text class="rules-title">签到奖励规则</text>
+    <view class="rule-row"><text class="day">第1天</text><text class="reward">¥0.50</text></view>
+    <view class="rule-row"><text class="day">第2天</text><text class="reward">¥1.00</text></view>
+    <view class="rule-row"><text class="day">第3天</text><text class="reward">¥1.50</text></view>
+    <view class="rule-row"><text class="day">第4天</text><text class="reward">¥2.00</text></view>
+    <view class="rule-row"><text class="day">第5天</text><text class="reward">¥2.50</text></view>
+    <view class="rule-row"><text class="day">第6天</text><text class="reward">¥3.00</text></view>
+    <view class="rule-row highlight"><text class="day">第7天</text><text class="reward">¥5.00</text></view>
+  </view>
+
+  <view class="history">
+    <text class="history-title">签到记录</text>
+    <view class="history-item" wx:for="{{signDays}}" wx:key="date">
+      <text>{{item.date}}</text>
+      <text class="history-reward">+¥{{item.reward}}</text>
+    </view>
+    <view class="empty" wx:if="{{signDays.length === 0}}">
+      <text>暂无签到记录</text>
+    </view>
+  </view>
+</view>

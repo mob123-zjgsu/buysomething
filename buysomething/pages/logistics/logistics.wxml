@@ -1,0 +1,78 @@
+<view class="logistics-container">
+  <!-- 物流头部 -->
+  <view class="logistics-header">
+    <text class="logistics-title">物流信息</text>
+    <view class="logistics-company">
+      <text class="company-name">{{logistics.company}}</text>
+      <text class="tracking-no" wx:if="{{logistics.trackingNo}}">运单号: {{logistics.trackingNo}}</text>
+    </view>
+  </view>
+
+  <!-- 腾讯地图 -->
+  <view class="map-section">
+    <map
+      id="logisticsMap"
+      class="logistics-map"
+      latitude="{{currentPosition.lat}}"
+      longitude="{{currentPosition.lng}}"
+      scale="6"
+      markers="{{markers}}"
+      polyline="{{polyline}}"
+      show-location
+      style="width: 100%; height: 450rpx;"
+    ></map>
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{progress}}%"></view>
+      <text class="progress-text">运输进度 {{progress}}%</text>
+    </view>
+  </view>
+
+  <!-- 时间快进控制 -->
+  <view class="time-control-section">
+    <text class="time-title">⏱️ 时间模拟</text>
+    <view class="time-buttons">
+      <button class="btn-time" bindtap="advanceDays" data-days="1" disabled="{{logistics.status === 'delivered'}}">⏩ 过去1天</button>
+      <button class="btn-time" bindtap="advanceDays" data-days="2" disabled="{{logistics.status === 'delivered'}}">⏩ 过去2天</button>
+      <button class="btn-time btn-time-fast" bindtap="advanceDays" data-days="3" disabled="{{logistics.status === 'delivered'}}">⏩ 过去3天</button>
+    </view>
+    <text class="time-hint" wx:if="{{dayOffset > 0}}">已快进 {{dayOffset}} 天</text>
+  </view>
+
+  <!-- 物流状态 & 操作按钮 -->
+  <view class="action-section">
+    <view class="status-info">
+      <view class="status-row">
+        <text class="status-label">当前状态</text>
+        <text class="status-value {{logistics.status === 'delivered' ? 'status-done' : ''}}">{{statusText}}</text>
+      </view>
+      <view class="status-row" wx:if="{{logistics.estimatedArrival}}">
+        <text class="status-label">预计到达</text>
+        <text class="status-value">{{logistics.estimatedArrival}}</text>
+      </view>
+    </view>
+    <view class="action-buttons">
+      <button class="btn-action btn-primary-action" bindtap="confirmReceive" wx:if="{{logistics.status !== 'delivered' && progress >= 90}}">✅ 确认收货</button>
+      <button class="btn-action btn-urge" bindtap="urgeOrder" wx:if="{{logistics.status === 'processing' || logistics.status === 'shipping'}}">🔔 催单提醒</button>
+      <button class="btn-action btn-refresh" bindtap="refreshPosition">🔄 刷新位置</button>
+      <button class="btn-action btn-aftersale" bindtap="applyAfterSale" wx:if="{{logistics.status !== 'processing' && logistics.status !== 'delivered'}}">📦 申请售后</button>
+      <button class="btn-action btn-complain" bindtap="complainLogistics">📢 物流投诉</button>
+    </view>
+  </view>
+
+  <!-- 物流事件时间线 -->
+  <view class="events-section">
+    <text class="events-title">📋 物流详情</text>
+    <view class="timeline">
+      <view class="timeline-item" wx:for="{{logistics.events}}" wx:key="time">
+        <view class="timeline-dot {{index === 0 ? 'active' : ''}} {{item.type === 'complaint' ? 'dot-complaint' : ''}} {{item.type === 'urge' ? 'dot-urge' : ''}} {{item.type === 'aftersale' ? 'dot-aftersale' : ''}}"></view>
+        <view class="timeline-content">
+          <text class="timeline-desc">{{item.desc}}</text>
+          <text class="timeline-time">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="empty-events" wx:if="{{logistics.events.length === 0}}">
+      <text>暂无物流信息，点击"过去1天"模拟物流进度</text>
+    </view>
+  </view>
+</view>

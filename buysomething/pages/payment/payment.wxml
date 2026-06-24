@@ -1,0 +1,44 @@
+<view class="payment-container">
+  <!-- 顶部订单信息 -->
+  <view class="payment-header">
+    <text class="payment-title">订单支付</text>
+    <text class="order-no">订单号: {{orderNo}}</text>
+  </view>
+
+  <!-- 支付金额 -->
+  <view class="amount-section">
+    <text class="amount-label">支付金额</text>
+    <view class="amount-row">
+      <text class="amount-symbol">¥</text>
+      <text class="amount-value">{{amount}}</text>
+    </view>
+    <text class="amount-sub">优选购物 · 微信支付</text>
+  </view>
+
+  <!-- 二维码区域 -->
+  <view class="qr-section">
+    <view class="qr-wrapper">
+      <canvas canvas-id="qrCanvas" class="qr-canvas"></canvas>
+    </view>
+    <text class="qr-tip">请使用微信扫描二维码完成支付</text>
+    <view class="countdown-row" wx:if="{{countdown > 0}}">
+      <text class="countdown-text">支付剩余时间 {{countdownMin}}:{{countdownSec}}</text>
+    </view>
+  </view>
+
+  <!-- 商品摘要 -->
+  <view class="goods-summary">
+    <view class="goods-item" wx:for="{{products}}" wx:key="uniqueId" wx:if="{{index < 3}}">
+      <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+      <text class="goods-name">{{item.name}}</text>
+      <text class="goods-qty">x{{item.quantity}}</text>
+    </view>
+    <text class="goods-more" wx:if="{{products.length > 3}}">共{{products.length}}件商品</text>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-section">
+    <button class="btn-cancel" bindtap="cancelPay">放弃支付</button>
+    <button class="btn-pay" bindtap="confirmPay">支付成功</button>
+  </view>
+</view>

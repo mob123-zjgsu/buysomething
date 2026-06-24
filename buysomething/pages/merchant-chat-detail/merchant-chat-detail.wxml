@@ -1,0 +1,32 @@
+<view class="chat-page">
+  <!-- 消息列表 -->
+  <scroll-view class="message-list" scroll-y scroll-top="{{scrollTop}}" enhanced show-scrollbar="false">
+    <block wx:for="{{messages}}" wx:key="_id">
+      <view class="message-row {{item.senderType === 'merchant' ? 'user' : 'assistant'}}">
+        <!-- 用户头像 -->
+        <view class="avatar avatar-user" wx:if="{{item.senderType === 'user'}}">
+          <text class="avatar-text">👤</text>
+        </view>
+        <!-- 商家头像 -->
+        <view class="avatar avatar-merchant" wx:if="{{item.senderType === 'merchant'}}">
+          <text class="avatar-text">🏪</text>
+        </view>
+        <!-- 消息内容 -->
+        <view class="message-content {{item.senderType === 'merchant' ? 'user' : 'assistant'}}">
+          <text class="message-text">{{item.content}}</text>
+          <text class="message-time">{{item.timeStr}}</text>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <!-- 输入区域 -->
+  <view class="input-area">
+    <view class="input-wrapper">
+      <input class="message-input" type="text" value="{{inputText}}" placeholder="回复客户..." confirm-type="send" bindinput="onInputChange" bindconfirm="sendMessage" />
+      <view class="send-btn {{inputText.trim() ? 'active' : ''}}" bindtap="sendMessage">
+        <text class="send-icon">➤</text>
+      </view>
+    </view>
+  </view>
+</view>

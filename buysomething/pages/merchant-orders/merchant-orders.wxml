@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="tabs">
+    <view class="tab {{activeTab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">全部</view>
+    <view class="tab {{activeTab === 'paid' ? 'active' : ''}}" bindtap="switchTab" data-tab="paid">待发货</view>
+    <view class="tab {{activeTab === 'completed' ? 'active' : ''}}" bindtap="switchTab" data-tab="completed">已完成</view>
+  </view>
+
+  <view class="empty" wx:if="{{orders.length === 0}}">
+    <text class="empty-icon">📦</text>
+    <text class="empty-text">暂无订单</text>
+  </view>
+
+  <view class="order-list">
+    <view class="order-card" wx:for="{{orders}}" wx:key="id">
+      <view class="order-header">
+        <text class="order-no">订单号: {{item.orderNo}}</text>
+        <text class="order-status">{{item.statusText}}</text>
+      </view>
+      <view class="order-body">
+        <text class="order-count">共{{item.totalCount}}件商品</text>
+        <text class="order-price">¥{{item.totalPrice}}</text>
+      </view>
+      <view class="order-footer">
+        <text class="order-time">{{item.createTime}}</text>
+        <button class="ship-btn" bindtap="shipOrder" data-id="{{item.id}}" wx:if="{{item.status === 1}}">发货</button>
+      </view>
+    </view>
+  </view>
+</view>

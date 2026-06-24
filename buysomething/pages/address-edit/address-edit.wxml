@@ -1,0 +1,62 @@
+<view class="address-edit-container">
+  <view class="form-section">
+    <view class="input-group">
+      <text class="label">收货人</text>
+      <input class="input" placeholder="请输入收货人姓名" value="{{formData.name}}" data-field="name" bindinput="onInput" />
+    </view>
+    <view class="input-group">
+      <text class="label">手机号</text>
+      <input class="input" type="number" placeholder="请输入手机号" value="{{formData.phone}}" data-field="phone" bindinput="onInput" />
+    </view>
+    <view class="input-group">
+      <text class="label">省份</text>
+      <picker class="picker" range="{{provinces}}" value="{{provinceIndex}}" bindchange="onProvinceChange">
+        <view class="picker-display {{formData.province ? '' : 'placeholder'}}">
+          {{formData.province || '请选择省份'}}
+          <text class="picker-arrow">▸</text>
+        </view>
+      </picker>
+    </view>
+    <view class="input-group" wx:if="{{cities.length > 0}}">
+      <text class="label">城市</text>
+      <picker class="picker" range="{{cities}}" value="{{cityIndex}}" bindchange="onCityChange">
+        <view class="picker-display {{formData.city ? '' : 'placeholder'}}">
+          {{formData.city || '请选择城市'}}
+          <text class="picker-arrow">▸</text>
+        </view>
+      </picker>
+    </view>
+    <view class="input-group" wx:if="{{districts.length > 0}}">
+      <text class="label">区县</text>
+      <picker class="picker" range="{{districts}}" value="{{districtIndex}}" bindchange="onDistrictChange">
+        <view class="picker-display {{formData.district ? '' : 'placeholder'}}">
+          {{formData.district || '请选择区县'}}
+          <text class="picker-arrow">▸</text>
+        </view>
+      </picker>
+    </view>
+    <view class="input-group">
+      <text class="label">详细地址</text>
+      <input class="input" placeholder="请输入详细地址" value="{{formData.detail}}" data-field="detail" bindinput="onInput" />
+    </view>
+  </view>
+
+  <!-- 标签选择 -->
+  <view class="tag-section">
+    <text class="label">地址标签</text>
+    <view class="tag-list">
+      <view class="tag-item {{formData.tag === item ? 'active' : ''}}" wx:for="{{tagOptions}}" wx:key="*this" bindtap="selectTag" data-tag="{{item}}">{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 默认地址 -->
+  <view class="default-section">
+    <text class="label">设为默认地址</text>
+    <switch checked="{{formData.isDefault}}" bindchange="toggleDefault" />
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="submit-section">
+    <button class="submit-btn" bindtap="onSubmit">{{isEdit ? '保存修改' : '添加地址'}}</button>
+  </view>
+</view>

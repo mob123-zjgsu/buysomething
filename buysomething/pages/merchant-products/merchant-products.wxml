@@ -1,0 +1,28 @@
+<view class="container">
+  <view class="empty" wx:if="{{products.length === 0}}">
+    <text class="empty-icon">🛍️</text>
+    <text class="empty-text">暂无商品</text>
+  </view>
+
+  <view class="product-list">
+    <view class="product-card" wx:for="{{products}}" wx:key="_id" bindtap="goToProductDetail" data-id="{{item._id}}">
+      <image class="product-img" src="{{item.image || '/images/product1.jpg'}}" mode="aspectFill" />
+      <view class="product-info">
+        <text class="product-name">{{item.name}}</text>
+        <text class="product-price">¥{{item.price}}</text>
+        <view class="product-status {{item.status === 1 ? 'online' : item.status === 0 ? 'pending' : 'offline'}}">
+          {{item.status === 1 ? '已上架' : item.status === 0 ? '审核中' : '已下架'}}
+        </view>
+      </view>
+      <view class="product-actions">
+        <text class="action-btn edit" bindtap="editProduct" data-id="{{item._id}}">编辑</text>
+        <text class="action-btn delete" bindtap="deleteProduct" data-id="{{item._id}}">下架</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-fab" bindtap="goToAddProduct">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

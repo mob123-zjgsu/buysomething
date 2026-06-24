@@ -1,0 +1,40 @@
+.container { min-height: 100vh; background: #f5f5f5; }
+.tabs { display: flex; background: #fff; }
+.tab { flex: 1; text-align: center; padding: 24rpx; font-size: 28rpx; color: #666; border-bottom: 4rpx solid transparent; }
+.tab.active { color: #1a1a2e; border-color: #1a1a2e; }
+.empty { text-align: center; padding: 150rpx 0; }
+.empty-icon { font-size: 80rpx; display: block; }
+.empty-text { font-size: 28rpx; color: #999; }
+.list { padding: 20rpx; }
+
+.card { background: #fff; border-radius: 12rpx; padding: 24rpx; margin-bottom: 16rpx; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx; }
+.order-no { font-size: 24rpx; color: #666; }
+.status-tag { font-size: 22rpx; padding: 6rpx 16rpx; border-radius: 16rpx; font-weight: 500; }
+.status-tag.pending { background: #fff3e0; color: #e65100; }
+.status-tag.approved { background: #e8f5e9; color: #2e7d32; }
+.status-tag.rejected { background: #ffebee; color: #c62828; }
+.status-tag.admin_approved { background: #e3f2fd; color: #1565c0; }
+.status-tag.admin_rejected { background: #fce4ec; color: #880e4f; }
+
+.card-body { }
+
+.section { background: #f9f9f9; border-radius: 8rpx; padding: 16rpx; margin-bottom: 12rpx; }
+.section-label { font-size: 24rpx; color: #666; font-weight: 500; display: block; margin-bottom: 8rpx; }
+.section-content { font-size: 24rpx; color: #333; display: block; line-height: 1.5; }
+.section-content.admin_approved { color: #1565c0; font-weight: 500; }
+.section-content.admin_rejected { color: #880e4f; font-weight: 500; }
+
+.user-section { border-left: 4rpx solid #667eea; }
+.merchant-section { border-left: 4rpx solid #ff9800; }
+.admin-section { border-left: 4rpx solid #1a1a2e; }
+
+.info-row { display: flex; margin-bottom: 8rpx; }
+.info-label { font-size: 24rpx; color: #999; width: 140rpx; flex-shrink: 0; }
+.info-value { font-size: 24rpx; color: #333; flex: 1; }
+.info-value.time { color: #999; font-size: 22rpx; }
+
+.card-actions { display: flex; gap: 20rpx; margin-top: 16rpx; padding-top: 16rpx; border-top: 1rpx solid #f0f0f0; }
+.btn { flex: 1; height: 76rpx; line-height: 76rpx; font-size: 28rpx; font-weight: 500; border: none; border-radius: 12rpx; }
+.btn-approve { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+.btn-reject { background: #ffebee; color: #c62828; }

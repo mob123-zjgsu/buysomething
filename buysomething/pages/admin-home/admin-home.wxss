@@ -1,0 +1,183 @@
+.admin-home {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60rpx 32rpx;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #FFFFFF;
+}
+
+.admin-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-name {
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+.admin-role {
+  font-size: 24rpx;
+  opacity: 0.7;
+  margin-top: 8rpx;
+}
+
+.logout-btn {
+  font-size: 26rpx;
+  padding: 12rpx 24rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 24rpx;
+}
+
+.switch-section {
+  background: #FFFFFF;
+  padding: 24rpx 32rpx;
+  margin-top: -40rpx;
+  border-radius: 24rpx 24rpx 0 0;
+}
+
+.switch-title {
+  font-size: 26rpx;
+  color: #999999;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.switch-buttons {
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn-switch {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 26rpx;
+  border: none;
+  border-radius: 12rpx;
+  color: #FFFFFF;
+}
+
+.btn-user {
+  background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+}
+
+.btn-merchant {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stats-section {
+  display: flex;
+  padding: 32rpx;
+  background: #FFFFFF;
+  margin-top: 0;
+}
+
+.stat-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+}
+
+.stat-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+.review-section {
+  background: #FFFFFF;
+  margin-top: 20rpx;
+}
+
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+.review-left {
+  display: flex;
+  align-items: center;
+}
+
+.review-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.review-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-title {
+  font-size: 30rpx;
+  color: #333333;
+}
+
+.review-desc {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 4rpx;
+}
+
+.review-badge {
+  background: #FF4757;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.list-section {
+  background: #FFFFFF;
+  margin-top: 20rpx;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.list-text {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333333;
+}
+
+.list-arrow {
+  font-size: 32rpx;
+  color: #CCCCCC;
+}

@@ -1,0 +1,34 @@
+# 云服务部署贡献说明
+
+姓名：XXX
+学号：XXX
+日期：XXXX-XX-XX
+
+## 我完成的工作
+
+### 1. 平台选择
+
+- 使用平台：XXX（如 Vercel / Railway / Render）
+
+### 2. 部署配置
+
+- [ ] 配置文件编写
+- [ ] 环境变量配置
+- [ ] 自动部署配置
+
+### 3. 问题解决
+
+- 遇到的问题：XXX
+- 解决方案：XXX
+
+## PR 链接
+
+- PR #X: https://github.com/xxx/xxx/pull/X
+
+## 在线地址
+
+https://your-app.vercel.app
+
+## 心得体会
+
+（简要说明在部署过程中的收获）

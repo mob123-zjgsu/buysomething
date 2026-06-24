@@ -1,0 +1,51 @@
+<view class="admin-products">
+  <view class="tabs">
+    <view class="tab {{tab === 'pending' ? 'active' : ''}}" bindtap="switchTab" data-tab="pending">待审核</view>
+    <view class="tab {{tab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">全部商品</view>
+  </view>
+  <view class="list">
+    <view class="item" wx:for="{{list}}" wx:key="_id" bindtap="viewDetail" data-id="{{item._id}}">
+      <image class="img" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="info">
+        <text class="name">{{item.name}}</text>
+        <text class="price">¥{{item.price}}</text>
+        <text class="detail-hint">点击查看详情→</text>
+      </view>
+      <view class="actions" wx:if="{{tab === 'pending'}}" catchtap="{{null}}">
+        <view class="btn approve" catchtap="approve" data-id="{{item._id}}">通过</view>
+        <view class="btn reject" catchtap="reject" data-id="{{item._id}}">拒绝</view>
+      </view>
+      <view class="btn delete" wx:if="{{tab === 'all'}}" catchtap="deleteProduct" data-id="{{item._id}}">删除</view>
+    </view>
+    <view class="empty" wx:if="{{list.length === 0}}">暂无数据</view>
+  </view>
+
+  <!-- 商品详情弹窗 -->
+  <view class="detail-modal" wx:if="{{showDetail}}">
+    <view class="modal-mask" bindtap="closeDetail"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">商品详情审核</text>
+        <text class="close-btn" bindtap="closeDetail">✕</text>
+      </view>
+      <view class="modal-body">
+        <image class="detail-img" src="{{detail.image}}" mode="aspectFill" />
+        <view class="detail-row"><text class="dl">商品名称</text><text class="dv">{{detail.name}}</text></view>
+        <view class="detail-row"><text class="dl">价格</text><text class="dv">¥{{detail.price}}</text></view>
+        <view class="detail-row"><text class="dl">库存</text><text class="dv">{{detail.stock || '未设置'}}</text></view>
+        <view class="detail-row"><text class="dl">分类</text><text class="dv">{{detail.category || '未设置'}}</text></view>
+        <view class="detail-row"><text class="dl">商品描述</text><text class="dv">{{detail.description || '无'}}</text></view>
+        <view class="detail-row"><text class="dl">商品规格</text><text class="dv">{{detail.spec || '无'}}</text></view>
+        <view class="detail-row" wx:if="{{detail.sizeGuide}}"><text class="dl">尺码指南</text><text class="dv">{{detail.sizeGuide}}</text></view>
+        <view class="detail-row" wx:if="{{detail.careInstructions}}"><text class="dl">保养说明</text><text class="dv">{{detail.careInstructions}}</text></view>
+        <view class="detail-faq" wx:if="{{detail.faq && detail.faq.length > 0}}">
+          <text class="dl">常见问题</text>
+          <view class="faq-item" wx:for="{{detail.faq}}" wx:key="q">
+            <text class="faq-q">Q: {{item.q}}</text>
+            <text class="faq-a">A: {{item.a}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

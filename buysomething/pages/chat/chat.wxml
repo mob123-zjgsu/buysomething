@@ -1,0 +1,135 @@
+<!-- pages/chat/chat.wxml -->
+<view class="chat-page">
+  <!-- 顶部导航 -->
+  <view class="chat-header">
+    <view class="header-left" bindtap="onBack">
+      <text class="icon-back">‹</text>
+    </view>
+    <view class="header-title">
+      <text class="title-text">{{chatType === 'merchant' ? merchantName : '智能客服'}}</text>
+      <text class="ai-status">{{chatType === 'merchant' ? '人工客服' : 'AI在线'}}</text>
+    </view>
+    <view class="header-right">
+      <text class="icon-more" bindtap="onClearChat">🗑️</text>
+    </view>
+  </view>
+
+  <!-- 携带商品信息 -->
+  <view class="product-card" wx:if="{{productInfo}}">
+    <image class="product-image" src="{{productInfo.image}}" mode="aspectFill"></image>
+    <view class="product-info">
+      <text class="product-name">{{productInfo.name}}</text>
+      <text class="product-price">¥{{productInfo.price}}</text>
+    </view>
+  </view>
+
+  <!-- 消息列表 -->
+  <scroll-view 
+    class="message-list" 
+    scroll-y 
+    scroll-top="{{scrollTop}}"
+    enhanced
+    show-scrollbar="false">
+    
+    <block wx:for="{{messages}}" wx:key="id">
+      <!-- AI/系统消息 -->
+      <view class="message-row {{item.role === 'user' ? 'user' : 'assistant'}}" wx:if="{{item.role !== 'system'}}">
+        <!-- AI 头像 -->
+        <view class="avatar avatar-ai" wx:if="{{item.role === 'assistant'}}">
+          <text class="avatar-text">{{chatType === 'merchant' ? '🏪' : '🤖'}}</text>
+        </view>
+        
+        <!-- 用户头像 -->
+        <view class="avatar avatar-user" wx:if="{{item.role === 'user'}}">
+          <text class="avatar-text">👤</text>
+        </view>
+        
+        <!-- 消息内容 -->
+        <view class="message-content {{item.role}}">
+          <text class="message-text">{{item.content}}</text>
+          <text class="message-time">{{item.time}}</text>
+        </view>
+      </view>
+
+      <!-- 系统消息（居中） -->
+      <view class="system-message" wx:if="{{item.role === 'system'}}">
+        <text class="system-text">{{item.content}}</text>
+      </view>
+    </block>
+
+    <!-- 加载中 -->
+    <view class="message-row assistant" wx:if="{{loading}}">
+      <view class="avatar avatar-ai">
+        <text class="avatar-text">{{chatType === 'merchant' ? '🏪' : '🤖'}}</text>
+      </view>
+      <view class="message-content assistant loading-content">
+        <view class="loading-dots">
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+        </view>
+      </view>
+    </view>
+
+  </scroll-view>
+
+  <!-- 快捷问题 -->
+  <view class="quick-questions" wx:if="{{messages.length < 3 && !loading}}">
+    <view class="quick-title">猜你想问</view>
+    <view class="quick-list" wx:if="{{chatType === 'merchant'}}">
+      <text class="quick-item" data-question="这件商品什么时候发货？" bindtap="onQuickQuestion">什么时候发货？</text>
+      <text class="quick-item" data-question="可以退换货吗？" bindtap="onQuickQuestion">可以退换货吗？</text>
+      <text class="quick-item" data-question="有优惠活动吗？" bindtap="onQuickQuestion">有优惠活动吗？</text>
+    </view>
+    <view class="quick-list" wx:else>
+      <text class="quick-item" data-question="这件商品有什么特点？" bindtap="onQuickQuestion">这件商品有什么特点？</text>
+      <text class="quick-item" data-question="尺码怎么选？" bindtap="onQuickQuestion">尺码怎么选？</text>
+      <text class="quick-item" data-question="发什么快递？" bindtap="onQuickQuestion">发什么快递？</text>
+    </view>
+  </view>
+
+  <!-- 输入区域 -->
+  <view class="input-area" style="padding-bottom: {{keyboardHeight > 0 ? keyboardHeight : '0'}}rpx;">
+    <view class="input-wrapper">
+      <!-- 转人工按钮（仅AI模式显示） -->
+      <view class="transfer-btn" bindtap="onTransferClick" wx:if="{{chatType === 'ai'}}">
+        <text>转人工</text>
+      </view>
+      
+      <!-- 输入框 -->
+      <input 
+        class="message-input"
+        type="text"
+        value="{{inputText}}"
+        placeholder="{{chatType === 'merchant' ? '输入消息...' : '输入您的问题...'}}"
+        confirm-type="send"
+        bindinput="onInputChange"
+        bindconfirm="onConfirm"
+        adjust-position="false"
+        cursor-spacing="20"
+      />
+      
+      <!-- 发送按钮 -->
+      <view 
+        class="send-btn {{inputText.trim() ? 'active' : ''}}" 
+        bindtap="sendMessage">
+        <text class="send-icon">➤</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 转人工确认弹窗 -->
+<view class="modal-mask" wx:if="{{showTransferModal}}" bindtap="onCloseTransferModal">
+  <view class="modal-content" catchtap="">
+    <view class="modal-title">转接人工客服</view>
+    <view class="modal-body">
+      <text>确定要转接人工客服吗？</text>
+      <text class="modal-tip">人工客服服务时间：9:00 - 21:00</text>
+    </view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel" bindtap="onCloseTransferModal">取消</view>
+      <view class="modal-btn confirm" bindtap="onConfirmTransfer">确定转接</view>
+    </view>
+  </view>
+</view>

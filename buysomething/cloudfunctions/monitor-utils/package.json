@@ -1,0 +1,7 @@
+{
+  "name": "monitor-utils",
+  "version": "1.0.0",
+  "description": "监控工具库 - 结构化日志和指标收集",
+  "main": "index.js",
+  "dependencies": {}
+}
