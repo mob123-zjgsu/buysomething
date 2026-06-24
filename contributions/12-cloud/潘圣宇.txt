@@ -1,0 +1,32 @@
+# 云服务部署贡献说明
+
+姓名：潘圣宇
+学号：2312190623
+日期：2026-05-31
+
+## 我完成的工作
+
+### 1. 平台选择
+
+- 使用平台：Vercel+腾讯云
+
+### 2. 部署配置
+
+- [✔ ] 配置文件编写
+- [✔ ] 环境变量配置
+- [✔ ] 自动部署配置
+
+### 3. 问题解决
+问题：云函数创建时出现 "entryFile did not find in code or layers" 错误
+  解决：发现是因为误把 cloudfunctions 目录名当成了函数名进行部署，cloudfunctions 是存放所有云函数的父目录而非单个函数，其中没有 index.js 入口文件。正确的做法是部署 cloudfunctions 下的各个具体函数子目录（如 health、login 等）。
+
+## PR 链接
+
+- PR #X: https://github.com/mob123-zjgsu/buysomething/pulls/mob123-zjgsu
+
+## 在线地址
+
+https://buysomething-m8s2.vercel.app/
+
+## 心得体会
+平台选择的策略：不同部署平台有不同定位——Vercel 擅长前端/全栈的快速部署（自动 HTTPS、Git 推送即部署），CloudBase 擅长微信生态的 Serverless 后端（云函数+数据库+存储一体），选对平台能让部署事半功倍。

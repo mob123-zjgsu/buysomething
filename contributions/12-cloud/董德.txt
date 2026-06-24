@@ -1,0 +1,32 @@
+# 云服务部署贡献说明
+
+姓名：董德
+学号：2312190612
+日期：2026-05-31
+
+## 我完成的工作
+
+### 1. 平台选择
+
+- 使用平台：Vercel+腾讯云
+
+### 2. 部署配置
+
+- [✔ ] 配置文件编写
+- [ ] 环境变量配置
+- [✔ ] 自动部署配置
+
+### 3. 问题解决
+问题：Vercel 部署配置多次调整才成功，先后遇到了 404 NOT_FOUND 和 500 错误
+   解决：最初使用 rewrites 路由模式时，Vercel 无法识别 .cjs 文件作为函数入口，报 404。改用 builds + routes 模式后路由正确但函数仍崩溃，最终排查是第三方依赖（express/cors）在 serverless 环境加载失败。总结出 Vercel 最稳定的部署模式：纯 Node.js handler + CommonJS + builds/routes 配置。
+
+## PR 链接
+
+- PR #X: https://github.com/mob123-zjgsu/buysomething/pulls/2312190612
+
+## 在线地址
+
+https://buysomething-m8s2.vercel.app/
+
+## 心得体会
+调试 serverless 部署的教训：Vercel 的三次失败（500 → 404 → 500 → 成功）让我深刻体会到 serverless 环境与传统服务器环境的差异——不是所有代码都能原样搬上去跑，需要根据平台的运行时约束做适配。
